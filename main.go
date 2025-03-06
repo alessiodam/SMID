@@ -5,6 +5,7 @@ import (
 	"github.com/alessiodam/SMID/db"
 	"github.com/alessiodam/SMID/handlers"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/earlydata"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
@@ -39,6 +40,11 @@ func main() {
 	}))
 	app.Use(etag.New())
 	app.Use(helmet.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "*",
+		AllowHeaders:     "Origin, Content-Type, Accept",
+		AllowCredentials: false,
+	}))
 	app.Use(limiter.New(limiter.Config{
 		Max:        3,
 		Expiration: 1 * time.Second,

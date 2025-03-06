@@ -18,6 +18,7 @@
       --accent-hover: #29b6f6;
       --error: #ff5252;
       --success: #4caf50;
+      --info: #ffb74d;
       --border-radius: 8px;
       --spacing-xs: 4px;
       --spacing-sm: 8px;
@@ -185,6 +186,12 @@
       border: 1px solid var(--success);
     }
 
+    .status.info {
+      background-color: rgba(255, 183, 77, 0.2);
+      color: var(--info);
+      border: 1px solid var(--info);
+    }
+
     .loading {
       display: none;
       align-items: center;
@@ -247,12 +254,38 @@
       margin-bottom: var(--spacing-sm);
     }
 
+    .log-container {
+      margin-top: var(--spacing-lg);
+      border-top: 1px solid var(--bg-tertiary);
+      padding-top: var(--spacing-md);
+    }
+
+    .log-entry {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .log-entry .timestamp {
+      color: var(--accent);
+      margin-right: var(--spacing-xs);
+    }
+
     footer {
       background-color: var(--bg-secondary);
       padding: var(--spacing-md);
       text-align: center;
       font-size: 0.9rem;
       color: var(--text-secondary);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
     }
 
     @media (max-width: 768px) {
@@ -331,6 +364,11 @@
           <pre id="rawResponse">No data yet. Submit the form to see results.</pre>
         </div>
       </div>
+
+      <div class="log-container">
+        <h3>Request Log:</h3>
+        <div id="requestLog"></div>
+      </div>
     </div>
 
     <div class="card">
@@ -347,19 +385,19 @@
 
       <h3>API Endpoints:</h3>
       <p>Request authentication code:</p>
-      <div class="api-endpoint">GET /v1/auth-code?domain=YOUR_SMARTSCHOOL_DOMAIN&phpSessId=YOUR_PHPSESSID</div>
+      <div class="api-endpoint">GET https://smid.alessiodam.dev/v1/auth-code?domain=YOUR_SMARTSCHOOL_DOMAIN&phpSessId=YOUR_PHPSESSID</div>
 
       <p>Request user ID:</p>
-      <div class="api-endpoint">GET /v1/user-id?code=THE_AUTH_CODE</div>
+      <div class="api-endpoint">GET https://smid.alessiodam.dev/v1/user-id?code=THE_AUTH_CODE</div>
 
       <h3>Security Note:</h3>
-      <p>Your session ID is sensitive information. This tool does not store your session data, but you should be careful when sharing it.</p>
+      <p>Your subdomain & PHPSESSID is sensitive information. This tool stores a hashed version of your PHPSESSID for caching purposes, but you should still be careful when sharing it.</p>
     </div>
   </div>
 
   <footer>
     <p>SMID is an unofficial tool and is not affiliated with SmartSchool.</p>
-    <p>Built and hosted by <a href="https://www.alessiodam.dev/" target="_blank">Alessio D'Ambrosio</a></p>
+    <p>Built and hosted by <a href="https://www.alessiodam.dev/" target="_blank" rel="noopener noreferrer">Alessio D'Ambrosio</a></p>
   </footer>
 
   <script>
@@ -371,18 +409,28 @@
     const loadingEl = document.getElementById('loading');
     const submitBtn = document.getElementById('submitBtn');
     const copyBtn = document.getElementById('copyBtn');
+    const requestLogEl = document.getElementById('requestLog');
 
     subdomainInput.addEventListener('input', function() {
       let subdomain = subdomainInput.value.toLowerCase().trim();
       subdomain = subdomain.replace(/[^a-z0-9-]/g, '');
       subdomainInput.value = subdomain;
-
       domainPreview.textContent = subdomain ? `${subdomain}.smartschool.be` : ".smartschool.be";
     });
 
+    function addLogEntry(message, type = 'info') {
+      const now = new Date();
+      const timestamp = now.toLocaleTimeString();
+      const logEntry = document.createElement('div');
+      logEntry.className = `log-entry ${type}`;
+      logEntry.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
+      requestLogEl.appendChild(logEntry);
+
+      requestLogEl.scrollTop = requestLogEl.scrollHeight;
+    }
+
     form.addEventListener('submit', async function(event) {
       event.preventDefault();
-
       const smartschoolSubdomain = subdomainInput.value.trim();
       const phpSessId = document.getElementById('phpSessId').value.trim();
 
@@ -398,51 +446,65 @@
 
       setLoading(true);
       hideStatus();
-
+      requestLogEl.innerHTML = '';
       const fullDomain = `${smartschoolSubdomain}.smartschool.be`;
-
       try {
         const authCodeUrl = `/v1/auth-code?domain=${encodeURIComponent(fullDomain)}&phpSessId=${encodeURIComponent(phpSessId)}`;
-        const authResponse = await fetch(authCodeUrl);
+        addLogEntry(`Requesting authentication code for domain: ${fullDomain}`);
 
+        const authResponse = await fetch(authCodeUrl);
         if (!authResponse.ok) {
+          addLogEntry(`Error: HTTP status ${authResponse.status} - ${authResponse.statusText}`, 'error');
           throw new Error(`HTTP error! Status: ${authResponse.status}`);
         }
 
         const authData = await authResponse.json();
+        addLogEntry(`Received authentication code response with status: ${authResponse.status}`);
 
         if (!authData.code) {
+          addLogEntry('Error: No authentication code in response', 'error');
           throw new Error('No authentication code received from server');
         }
 
         rawResponse.textContent = JSON.stringify(authData, null, 2);
         showStatus(`Authentication code received: ${authData.code}`, 'success');
+        addLogEntry(`Authentication code: ${authData.code.substring(0, 8)}...`, 'success');
 
         const authCode = authData.code;
 
         const userIdUrl = `/v1/user-id?code=${encodeURIComponent(authCode)}`;
+        addLogEntry(`Requesting user ID with authentication code`);
+
         const userIdResponse = await fetch(userIdUrl);
 
         if (!userIdResponse.ok) {
+          addLogEntry(`Error: HTTP status ${userIdResponse.status} - ${userIdResponse.statusText}`, 'error');
           throw new Error(`HTTP error! Status: ${userIdResponse.status}`);
         }
 
         const userData = await userIdResponse.json();
+        addLogEntry(`Received user ID response with status: ${userIdResponse.status}`);
 
         rawResponse.textContent = JSON.stringify(userData, null, 2);
 
-        if (userData.user_id) {
-          showStatus(`Successfully retrieved user ID: ${userData.user_id}`, 'success');
+        if (userData.userId || userData.user_id) {
+          const userId = userData.userId || userData.user_id;
+          showStatus(`Successfully retrieved user ID: ${userId}`, 'success');
+          addLogEntry(`User ID retrieved: ${userId}`, 'success');
         } else if (userData.error) {
           showStatus(`Error: ${userData.error}`, 'error');
+          addLogEntry(`Error: ${userData.error}`, 'error');
         } else {
           showStatus('User ID not found in response', 'error');
+          addLogEntry('User ID not found in response', 'error');
         }
       } catch (error) {
         rawResponse.textContent = `Error: ${error.message}`;
         showStatus(error.message, 'error');
+        addLogEntry(`Error: ${error.message}`, 'error');
       } finally {
         setLoading(false);
+        addLogEntry('Request process completed');
       }
     });
 

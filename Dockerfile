@@ -10,7 +10,7 @@ RUN go mod download -x
 
 ARG TARGETARCH
 
-RUN CGO_ENABLED=0 GOARCH=$TARGETARCH go build -o /bin/server ./main.go
+RUN CGO_ENABLED=0 GOARCH=$TARGETARCH go build -ldflags="-s -w" -o /bin/server ./main.go
 
 FROM alpine:latest AS final
 
