@@ -1,0 +1,12 @@
+services:
+  smid:
+    image: ghcr.io/alessiodam/smid:stable
+    container_name: smid
+    restart: unless-stopped
+    ports:
+      - "8100:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "http://localhost:8000/live"]
+      interval: 5s
+      retries: 5
+      start_period: 5s

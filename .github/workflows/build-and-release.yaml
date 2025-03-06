@@ -1,0 +1,38 @@
+name: Publish Docker Image to GitHub Container Registry
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image to GitHub Container Registry
+        uses: docker/build-push-action@v3
+        with:
+          context: ./
+          file: Dockerfile
+          push: true
+          tags: |
+            ghcr.io/alessiodam/smid:stable 
+            ghcr.io/alessiodam/smid:${{ github.ref_name }}
+            ghcr.io/alessiodam/smid:latest
+          build-args: |
+            VERSION=${{ github.ref_name }}
+            PORT=8000

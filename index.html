@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMID - Unofficial SmartSchool User ID</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #121212;
+      --bg-secondary: #1e1e1e;
+      --bg-tertiary: #2e2e2e;
+      --text-primary: #ffffff;
+      --text-secondary: #e0e0e0;
+      --accent: #4fc3f7;
+      --accent-hover: #29b6f6;
+      --error: #ff5252;
+      --success: #4caf50;
+      --border-radius: 8px;
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      --transition: all 0.2s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: var(--bg-secondary);
+      padding: var(--spacing-lg);
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      position: relative;
+      z-index: 10;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      margin-bottom: var(--spacing-md);
+      color: var(--accent);
+      border-bottom: 1px solid var(--accent);
+      padding-bottom: var(--spacing-xs);
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      margin: var(--spacing-lg) 0 var(--spacing-sm);
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      padding: var(--spacing-lg);
+      gap: var(--spacing-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .card {
+      background-color: var(--bg-secondary);
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      padding: var(--spacing-lg);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group {
+      margin-bottom: var(--spacing-md);
+    }
+
+    label {
+      display: block;
+      margin-bottom: var(--spacing-xs);
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: var(--spacing-md);
+      background-color: var(--bg-tertiary);
+      border: 1px solid var(--bg-tertiary);
+      border-radius: var(--border-radius);
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.3);
+    }
+
+    button {
+      background-color: var(--accent);
+      color: #000;
+      border: none;
+      padding: var(--spacing-md);
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: var(--spacing-md);
+    }
+
+    button:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .domain-preview {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-top: var(--spacing-xs);
+    }
+
+    .domain-value {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    pre {
+      background-color: var(--bg-tertiary);
+      padding: var(--spacing-md);
+      border-radius: var(--border-radius);
+      overflow-x: auto;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 0.9rem;
+      margin-top: var(--spacing-sm);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .api-endpoint {
+      background-color: var(--bg-tertiary);
+      padding: var(--spacing-md);
+      border-radius: var(--border-radius);
+      margin: var(--spacing-sm) 0 var(--spacing-lg);
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      overflow-x: auto;
+    }
+
+    .status {
+      margin-top: var(--spacing-md);
+      padding: var(--spacing-md);
+      border-radius: var(--border-radius);
+      display: none;
+    }
+
+    .status.error {
+      background-color: rgba(255, 82, 82, 0.2);
+      color: var(--error);
+      border: 1px solid var(--error);
+    }
+
+    .status.success {
+      background-color: rgba(76, 175, 80, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .loading {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      margin-top: var(--spacing-md);
+    }
+
+    .loading-spinner {
+      border: 3px solid rgba(79, 195, 247, 0.3);
+      border-radius: 50%;
+      border-top: 3px solid var(--accent);
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin-right: var(--spacing-sm);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .response-container {
+      margin-top: var(--spacing-lg);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .response-container h3 {
+      margin-top: 0;
+    }
+
+    .response-wrapper {
+      flex: 1;
+      overflow: auto;
+    }
+
+    .copy-btn {
+      background-color: var(--bg-tertiary);
+      color: var(--text-secondary);
+      border: 1px solid var(--bg-tertiary);
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--border-radius);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-left: auto;
+      display: inline-block;
+    }
+
+    .copy-btn:hover {
+      background-color: var(--accent);
+      color: #000;
+    }
+
+    .header-with-actions {
+      display: flex;
+      align-items: center;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    footer {
+      background-color: var(--bg-secondary);
+      padding: var(--spacing-md);
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        padding: var(--spacing-md);
+      }
+
+      header {
+        padding: var(--spacing-md);
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .card {
+        padding: var(--spacing-md);
+      }
+
+      pre, .api-endpoint {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SMID - Unofficial SmartSchool User ID</h1>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>Test Authentication</h2>
+      <form id="testForm">
+        <div class="form-group">
+          <label for="smartschoolSubdomain">SmartSchool Subdomain:</label>
+          <input
+            type="text"
+            id="smartschoolSubdomain"
+            placeholder="e.g. schoolname"
+            autocomplete="off"
+            required
+          >
+          <p class="domain-preview">Full Domain: <span class="domain-value" id="domainPreview">.smartschool.be</span></p>
+        </div>
+
+        <div class="form-group">
+          <label for="phpSessId">PHPSESSID:</label>
+          <input
+            type="text"
+            id="phpSessId"
+            placeholder="Your SmartSchool session ID"
+            autocomplete="off"
+            required
+          >
+          <p class="domain-preview">This is the cookie value from your SmartSchool session</p>
+        </div>
+
+        <button type="submit" id="submitBtn">Get User ID</button>
+      </form>
+
+      <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <span>Processing request...</span>
+      </div>
+
+      <div class="status" id="status"></div>
+
+      <div class="response-container">
+        <div class="header-with-actions">
+          <h3>Response:</h3>
+          <button class="copy-btn" id="copyBtn">Copy</button>
+        </div>
+        <div class="response-wrapper">
+          <pre id="rawResponse">No data yet. Submit the form to see results.</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>For Developers</h2>
+      <p>This tool helps you retrieve your SmartSchool user ID using your session cookie.</p>
+
+      <h3>How to use:</h3>
+      <ol>
+        <li>Log in to your SmartSchool account</li>
+        <li>Get your PHPSESSID cookie value (using browser developer tools)</li>
+        <li>Enter your school's subdomain and the PHPSESSID in the form</li>
+        <li>Submit to retrieve your user ID</li>
+      </ol>
+
+      <h3>API Endpoints:</h3>
+      <p>Request authentication code:</p>
+      <div class="api-endpoint">GET /v1/auth-code?domain=YOUR_SMARTSCHOOL_DOMAIN&phpSessId=YOUR_PHPSESSID</div>
+
+      <p>Request user ID:</p>
+      <div class="api-endpoint">GET /v1/user-id?code=THE_AUTH_CODE</div>
+
+      <h3>Security Note:</h3>
+      <p>Your session ID is sensitive information. This tool does not store your session data, but you should be careful when sharing it.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>SMID is an unofficial tool and is not affiliated with SmartSchool.</p>
+    <p>Built and hosted by <a href="https://www.alessiodam.dev/" target="_blank">Alessio D'Ambrosio</a></p>
+  </footer>
+
+  <script>
+    const subdomainInput = document.getElementById('smartschoolSubdomain');
+    const domainPreview = document.getElementById('domainPreview');
+    const form = document.getElementById('testForm');
+    const rawResponse = document.getElementById('rawResponse');
+    const statusEl = document.getElementById('status');
+    const loadingEl = document.getElementById('loading');
+    const submitBtn = document.getElementById('submitBtn');
+    const copyBtn = document.getElementById('copyBtn');
+
+    subdomainInput.addEventListener('input', function() {
+      let subdomain = subdomainInput.value.toLowerCase().trim();
+      subdomain = subdomain.replace(/[^a-z0-9-]/g, '');
+      subdomainInput.value = subdomain;
+
+      domainPreview.textContent = subdomain ? `${subdomain}.smartschool.be` : ".smartschool.be";
+    });
+
+    form.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      const smartschoolSubdomain = subdomainInput.value.trim();
+      const phpSessId = document.getElementById('phpSessId').value.trim();
+
+      if (!smartschoolSubdomain) {
+        showStatus('Please enter a SmartSchool subdomain.', 'error');
+        return;
+      }
+
+      if (!phpSessId) {
+        showStatus('Please enter your PHPSESSID.', 'error');
+        return;
+      }
+
+      setLoading(true);
+      hideStatus();
+
+      const fullDomain = `${smartschoolSubdomain}.smartschool.be`;
+
+      try {
+        const authCodeUrl = `/v1/auth-code?domain=${encodeURIComponent(fullDomain)}&phpSessId=${encodeURIComponent(phpSessId)}`;
+        const authResponse = await fetch(authCodeUrl);
+
+        if (!authResponse.ok) {
+          throw new Error(`HTTP error! Status: ${authResponse.status}`);
+        }
+
+        const authData = await authResponse.json();
+
+        if (!authData.code) {
+          throw new Error('No authentication code received from server');
+        }
+
+        rawResponse.textContent = JSON.stringify(authData, null, 2);
+        showStatus(`Authentication code received: ${authData.code}`, 'success');
+
+        const authCode = authData.code;
+
+        const userIdUrl = `/v1/user-id?code=${encodeURIComponent(authCode)}`;
+        const userIdResponse = await fetch(userIdUrl);
+
+        if (!userIdResponse.ok) {
+          throw new Error(`HTTP error! Status: ${userIdResponse.status}`);
+        }
+
+        const userData = await userIdResponse.json();
+
+        rawResponse.textContent = JSON.stringify(userData, null, 2);
+
+        if (userData.user_id) {
+          showStatus(`Successfully retrieved user ID: ${userData.user_id}`, 'success');
+        } else if (userData.error) {
+          showStatus(`Error: ${userData.error}`, 'error');
+        } else {
+          showStatus('User ID not found in response', 'error');
+        }
+      } catch (error) {
+        rawResponse.textContent = `Error: ${error.message}`;
+        showStatus(error.message, 'error');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    copyBtn.addEventListener('click', function() {
+      const textToCopy = rawResponse.textContent;
+      navigator.clipboard.writeText(textToCopy)
+        .then(() => {
+          const originalText = copyBtn.textContent;
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => {
+            copyBtn.textContent = originalText;
+          }, 2000);
+        })
+        .catch(err => {
+          console.error('Failed to copy: ', err);
+        });
+    });
+
+    function showStatus(message, type) {
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`;
+      statusEl.style.display = 'block';
+    }
+
+    function hideStatus() {
+      statusEl.style.display = 'none';
+    }
+
+    function setLoading(isLoading) {
+      if (isLoading) {
+        loadingEl.style.display = 'flex';
+        submitBtn.disabled = true;
+      } else {
+        loadingEl.style.display = 'none';
+        submitBtn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
