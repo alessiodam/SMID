@@ -85,14 +85,18 @@ func UserIdHandler(c *fiber.Ctx) error {
 	if code == "" {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Missing code query parameter"})
 	}
-	var auth models.AuthCode
-	if err := db.DB.Where("code = ?", code).First(&auth).Error; err != nil {
+	var authCode models.AuthCode
+	if err := db.DB.Where("code = ?", code).First(&authCode).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return c.Status(http.StatusNotFound).JSON(fiber.Map{"error": "Code not found"})
 		}
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
-	return c.JSON(fiber.Map{"user_id": auth.UserID})
+	if time.Since(authCode.CreatedAt) > time.Minute {
+		db.DB.Delete(&authCode)
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Code expired"})
+	}
+	return c.JSON(fiber.Map{"user_id": authCode.UserID})
 }
 
 func getCachedUser(phpHash string) (int64, error) {
