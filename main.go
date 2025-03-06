@@ -2,6 +2,12 @@ package main
 
 import (
 	_ "embed"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/alessiodam/SMID/db"
 	"github.com/alessiodam/SMID/handlers"
 	"github.com/gofiber/fiber/v2"
@@ -14,8 +20,6 @@ import (
 	gofiberLogger "github.com/gofiber/fiber/v2/middleware/logger"
 	gofiberRecover "github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/joho/godotenv"
-	"log"
-	"time"
 )
 
 //go:embed index.html
@@ -25,37 +29,53 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, relying on environment variables")
 	}
-	db.InitDB()
+
+	if err := db.InitDB(); err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+	defer func() {
+		if err := db.CloseDB(); err != nil {
+			log.Printf("Error closing database connection: %v", err)
+		} else {
+			log.Println("Database connection closed successfully")
+		}
+	}()
+
 	app := fiber.New()
+
 	app.Use(earlydata.New())
+
 	app.Use(gofiberRecover.New(gofiberRecover.Config{
 		StackTraceHandler: func(c *fiber.Ctx, e interface{}) {
-			err := c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Unknown error occurred",
-			})
-			if err != nil {
-				log.Println("Error while handling error")
+			if err := c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Internal Server Error",
+			}); err != nil {
+				log.Printf("Error sending error response: %v", err)
 			}
 		},
 	}))
+
 	app.Use(etag.New())
+
 	app.Use(helmet.New())
+
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     "*",
 		AllowHeaders:     "Origin, Content-Type, Accept",
 		AllowCredentials: false,
 	}))
+
 	app.Use(limiter.New(limiter.Config{
 		Max:        3,
 		Expiration: 1 * time.Second,
 	}))
+
 	app.Use(healthcheck.New(healthcheck.Config{
-		LivenessProbe: func(c *fiber.Ctx) bool {
-			return true
-		},
+		LivenessProbe:     func(c *fiber.Ctx) bool { return true },
 		LivenessEndpoint:  "/live",
 		ReadinessEndpoint: "/ready",
 	}))
+
 	app.Use(gofiberLogger.New(gofiberLogger.Config{
 		Format: "[${ip}]:${port} ${status} - ${method} ${path}\n",
 	}))
@@ -66,5 +86,37 @@ func main() {
 
 	app.Get("/v1/auth-code", handlers.AuthCodeHandler)
 	app.Get("/v1/user-id", handlers.UserIdHandler)
-	log.Fatal(app.Listen(":8000"))
+
+	serverErrors := make(chan error, 1)
+
+	go func() {
+		log.Println("Starting server on :8000")
+		serverErrors <- app.Listen(":8000")
+	}()
+
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case err := <-serverErrors:
+		log.Fatalf("Server error: %v", err)
+	case sig := <-signalChan:
+		log.Printf("Received signal: %v. Initiating shutdown...", sig)
+	}
+
+	shutdownTimeout := 5 * time.Second
+	shutdownDone := make(chan struct{})
+	go func() {
+		if err := app.Shutdown(); err != nil {
+			log.Printf("Error during server shutdown: %v", err)
+		}
+		close(shutdownDone)
+	}()
+
+	select {
+	case <-shutdownDone:
+		log.Println("Server shutdown completed gracefully")
+	case <-time.After(shutdownTimeout):
+		log.Println("Server shutdown timed out")
+	}
 }
