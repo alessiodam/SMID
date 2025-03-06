@@ -294,7 +294,6 @@
       text-decoration: underline;
     }
 
-    /* Auth Popup Styles */
     .popup-overlay {
       position: fixed;
       top: 0;
@@ -608,7 +607,7 @@
             extensionStatusEl.className = 'extension-status not-available';
             extensionStatusEl.innerHTML = `
               <strong>✗ SMID Extension Not Detected</strong>
-              <p>Please install the <a href="https://github.com/alessiodam/SMID-auth-extension/releases/latest" target="_blank" rel="noopener noreferrer">SMID extension from the Chrome Web Store</a>.</p>
+              <p>Please install the <a href="https://github.com/alessiodam/SMID-auth-extension/releases/latest" target="_blank" rel="noopener noreferrer" style="color: white">SMID extension from the Chrome Web Store</a>.</p>
             `;
             submitBtn.disabled = true;
             addLogEntry("SMID extension is not available", "error");
