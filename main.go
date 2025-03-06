@@ -25,6 +25,9 @@ import (
 //go:embed index.html
 var indexHTML string
 
+//go:embed smid-client.js
+var SMIDClientJS string
+
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, relying on environment variables")
@@ -82,6 +85,11 @@ func main() {
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Type("html").SendString(indexHTML)
+	})
+
+	app.Get("/smid-client.js", func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "application/javascript")
+		return c.SendString(SMIDClientJS)
 	})
 
 	app.Get("/v1/auth-code", handlers.AuthCodeHandler)
