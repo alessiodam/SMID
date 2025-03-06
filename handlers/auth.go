@@ -5,15 +5,25 @@ import (
 	"github.com/alessiodam/SMID/db"
 	"github.com/alessiodam/SMID/models"
 	"github.com/alessiodam/SMID/utils"
+	"github.com/bwmarrin/snowflake"
+	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
+
+var snowflakeNode *snowflake.Node
+
+func init() {
+	var err error
+	snowflakeNode, err = snowflake.NewNode(1)
+	if err != nil {
+		log.Fatalf("Failed to create snowflake node: %v", err)
+	}
+}
 
 func AuthCodeHandler(c *fiber.Ctx) error {
 	domain := c.Query("domain")
@@ -29,7 +39,7 @@ func AuthCodeHandler(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	if userID == "" {
+	if userID == 0 {
 		source = "upstream"
 		upstreamID, err := utils.PerformUpstreamRequest(domain, phpSessId)
 		if err != nil {
@@ -39,7 +49,7 @@ func AuthCodeHandler(c *fiber.Ctx) error {
 		result := db.DB.Where("upstream_id = ?", upstreamID).First(&user)
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			user = models.User{
-				ID:         uuid.New().String(),
+				ID:         snowflakeNode.Generate().Int64(),
 				UpstreamID: upstreamID,
 				CreatedAt:  time.Now(),
 			}
@@ -85,23 +95,23 @@ func UserIdHandler(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"user_id": auth.UserID})
 }
 
-func getCachedUser(phpHash string) (string, error) {
+func getCachedUser(phpHash string) (int64, error) {
 	var cache models.Cache
 	result := db.DB.Where("php_hash = ?", phpHash).First(&cache)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return "", nil
+		return 0, nil
 	}
 	if result.Error != nil {
-		return "", result.Error
+		return 0, result.Error
 	}
 	if time.Now().Unix() > cache.ExpiresAt {
 		db.DB.Delete(&cache)
-		return "", nil
+		return 0, nil
 	}
 	return cache.UserID, nil
 }
 
-func cacheUser(phpHash, userID string) error {
+func cacheUser(phpHash string, userID int64) error {
 	cache := models.Cache{
 		PhpHash:   phpHash,
 		UserID:    userID,
