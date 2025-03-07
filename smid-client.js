@@ -5,39 +5,39 @@ class SMIDClient {
     this.isExtensionAvailable = null;
   }
 
-  async checkExtension() {
-    try {
-      if (this.isExtensionAvailable !== null) {
-        return this.isExtensionAvailable;
-      }
-
-      return new Promise((resolve) => {
-        try {
-          chrome.runtime.sendMessage(
-              EXTENSION_ID,
-              { action: 'getAuthCode', domain: 'test.smartschool.be' },
-              (response) => {
-                const isAvailable = !chrome.runtime.lastError && !!response;
-                this.isExtensionAvailable = isAvailable;
-                resolve(isAvailable);
-              }
-          );
-
-          setTimeout(() => {
-            if (this.isExtensionAvailable === null) {
-              this.isExtensionAvailable = false;
-              resolve(false);
+  getExtensionVersion() {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+          EXTENSION_ID,
+          { action: 'getVersion' },
+          (response) => {
+            if (chrome.runtime.lastError) {
+              reject(new Error('Extension connection error: ' + chrome.runtime.lastError.message));
+              return;
             }
-          }, 500);
-        } catch (e) {
-          this.isExtensionAvailable = false;
-          resolve(false);
-        }
-      });
+            console.log(response);
+            if (response && response.success) {
+              console.log('SMID Extension version:', response.version);
+              resolve(response.version);
+            } else {
+              reject(new Error(response?.error || 'Request failed or was rejected'));
+            }
+          }
+      );
+    });
+  }
+
+  async checkExtension() {
+    if (this.isExtensionAvailable !== null) {
+      return this.isExtensionAvailable;
+    }
+    try {
+      const version = await this.getExtensionVersion();
+      this.isExtensionAvailable = !!version;
     } catch (error) {
       this.isExtensionAvailable = false;
-      return false;
     }
+    return this.isExtensionAvailable;
   }
 
   getAuthCode(domain) {
@@ -48,24 +48,18 @@ class SMIDClient {
           reject(new Error('SMID extension not found. Please install the extension first.'));
           return;
         }
-
         if (!domain || typeof domain !== 'string' || !domain.endsWith('smartschool.be')) {
           reject(new Error('Invalid domain. Must be a valid *.smartschool.be domain.'));
           return;
         }
-
         chrome.runtime.sendMessage(
             EXTENSION_ID,
-            {
-              action: 'getAuthCode',
-              domain: domain
-            },
+            { action: 'getAuthCode', domain: domain },
             (response) => {
               if (chrome.runtime.lastError) {
                 reject(new Error('Extension connection error: ' + chrome.runtime.lastError.message));
                 return;
               }
-
               if (response && response.success) {
                 resolve(response.data);
               } else {

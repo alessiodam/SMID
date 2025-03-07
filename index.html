@@ -572,35 +572,34 @@
         try {
           addLogEntry("Checking SMID extension availability...");
           const isAvailable = await smidClient.checkExtension();
-
           extensionStatusEl.style.display = 'block';
-
           if (isAvailable) {
+            const version = await smidClient.getExtensionVersion();
             extensionStatusEl.className = 'extension-status available';
             extensionStatusEl.innerHTML = `
-          <strong>✓ SMID Extension Detected</strong>
-          <p>The SMID extension is installed and ready to use.</p>
-        `;
+              <strong>✓ SMID Extension Detected</strong>
+              <p>The SMID extension is installed and ready to use.</p>
+              <p>Version: ${version}</p>
+            `;
             submitBtn.disabled = false;
-            addLogEntry("SMID extension is available", "success");
+            addLogEntry("SMID extension is available, version: " + version, "success");
           } else {
             extensionStatusEl.className = 'extension-status not-available';
             extensionStatusEl.innerHTML = `
-          <strong>✗ SMID Extension Not Detected</strong>
-          <p>Please install the <a href="https://github.com/alessiodam/SMID-auth-extension/releases/latest" target="_blank" rel="noopener noreferrer" style="color: white">SMID extension from the Chrome Web Store</a>.</p>
-        `;
+              <strong>✗ SMID Extension Not Detected</strong>
+              <p>Please install the <a href="https://github.com/alessiodam/SMID-auth-extension/releases/latest" target="_blank" rel="noopener noreferrer" style="color: white">SMID extension from the Chrome Web Store</a>.</p>
+            `;
             submitBtn.disabled = true;
             addLogEntry("SMID extension is not available", "error");
           }
-
           return isAvailable;
         } catch (error) {
           extensionStatusEl.style.display = 'block';
           extensionStatusEl.className = 'extension-status not-available';
           extensionStatusEl.innerHTML = `
-        <strong>✗ Error Checking Extension</strong>
-        <p>${error.message}</p>
-      `;
+            <strong>✗ Error Checking Extension</strong>
+            <p>${error.message}</p>
+          `;
           submitBtn.disabled = true;
           addLogEntry(`Error checking extension: ${error.message}`, "error");
           return false;

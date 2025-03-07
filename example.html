@@ -48,8 +48,8 @@
     try {
       const isAvailable = await client.checkExtension();
       elements.extensionStatus.textContent = isAvailable ?
-              "✓ SMID Extension Detected" :
-              "✗ SMID Extension Not Detected - Please install it first";
+        `✓ SMID Extension Detected, version: ${await client.getExtensionVersion()}` :
+        `✗ SMID Extension Not Detected - Please install it first`;
       elements.submitBtn.disabled = !isAvailable;
       return isAvailable;
     } catch (error) {
