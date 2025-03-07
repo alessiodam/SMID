@@ -72,6 +72,9 @@
       const result = await client.getAuthCode(domain);
       elements.response.textContent = JSON.stringify(result, null, 2);
       elements.status.textContent = 'Success';
+
+      await fetchUserId(result.code);
+
       return result;
     } catch (error) {
       if (retry && error.message === "No active tab found for the specified domain") {
@@ -80,6 +83,17 @@
         return requestAuthCode(domain, false);
       }
       throw error;
+    }
+  }
+
+  async function fetchUserId(authCode) {
+    elements.response.textContent += '\n\nFetching user ID...';
+    try {
+      const response = await fetch(`https://smid.alessiodam.dev/v1/user-id?code=${authCode}`);
+      const data = await response.json();
+      elements.response.textContent += `\nUser ID: ${data.user_id}`;
+    } catch (error) {
+      elements.response.textContent += `\nError fetching user ID: ${error.message}`;
     }
   }
 
