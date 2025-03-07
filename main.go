@@ -63,7 +63,9 @@ func main() {
 
 	app.Use(etag.New())
 
-	app.Use(helmet.New())
+	app.Use(helmet.New(helmet.Config{
+		CrossOriginResourcePolicy: "cross-origin",
+	}))
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     "*",
@@ -96,7 +98,6 @@ func main() {
 
 	app.Get("/smid-client.js", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "application/javascript")
-		c.Set("Cross-Origin-Resource-Policy", "cross-origin")
 		return c.SendString(SMIDClientJS)
 	})
 
