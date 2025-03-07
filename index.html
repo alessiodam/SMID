@@ -446,7 +446,6 @@
         </div>
 
         <button type="submit" id="submitBtn" disabled>Get User ID</button>
-        <button type="button" id="openSmartschoolBtn" disabled>Open SmartSchool in New Tab</button>
       </form>
 
       <div class="loading" id="loading">
@@ -534,7 +533,6 @@
       const submitBtn = document.getElementById('submitBtn');
       const copyBtn = document.getElementById('copyBtn');
       const requestLogEl = document.getElementById('requestLog');
-      const openSmartschoolBtn = document.getElementById('openSmartschoolBtn');
       const checkExtensionBtn = document.getElementById('checkExtensionBtn');
       const extensionStatusEl = document.getElementById('extensionStatus');
       const authPopup = document.getElementById('authPopup');
@@ -550,21 +548,6 @@
         subdomain = subdomain.replace(/[^a-z0-9-]/g, '');
         subdomainInput.value = subdomain;
         domainPreview.textContent = subdomain ? `${subdomain}.smartschool.be` : ".smartschool.be";
-        updateOpenSmartschoolButton();
-      });
-
-      function updateOpenSmartschoolButton() {
-        const subdomain = subdomainInput.value.trim();
-        openSmartschoolBtn.disabled = !subdomain;
-      }
-
-      openSmartschoolBtn.addEventListener('click', function() {
-        const subdomain = subdomainInput.value.trim();
-        if (subdomain) {
-          const url = `https://${subdomain}.smartschool.be`;
-          window.open(url, '_blank');
-          addLogEntry(`Opened SmartSchool domain: ${url}`);
-        }
       });
 
       function addLogEntry(message, type = 'info') {
@@ -599,7 +582,6 @@
           <p>The SMID extension is installed and ready to use.</p>
         `;
             submitBtn.disabled = false;
-            updateOpenSmartschoolButton();
             addLogEntry("SMID extension is available", "success");
           } else {
             extensionStatusEl.className = 'extension-status not-available';
