@@ -14,13 +14,13 @@ class SMIDClient {
       return new Promise((resolve) => {
         try {
           chrome.runtime.sendMessage(
-            EXTENSION_ID,
-            { action: 'ping' },
-            (response) => {
-              const isAvailable = !chrome.runtime.lastError;
-              this.isExtensionAvailable = isAvailable;
-              resolve(isAvailable);
-            }
+              EXTENSION_ID,
+              { action: 'getAuthCode', domain: 'test.smartschool.be' },
+              (response) => {
+                const isAvailable = !chrome.runtime.lastError && !!response;
+                this.isExtensionAvailable = isAvailable;
+                resolve(isAvailable);
+              }
           );
 
           setTimeout(() => {
@@ -55,23 +55,23 @@ class SMIDClient {
         }
 
         chrome.runtime.sendMessage(
-          EXTENSION_ID,
-          {
-            action: 'getAuthCode',
-            domain: domain
-          },
-          (response) => {
-            if (chrome.runtime.lastError) {
-              reject(new Error('Extension connection error: ' + chrome.runtime.lastError.message));
-              return;
-            }
+            EXTENSION_ID,
+            {
+              action: 'getAuthCode',
+              domain: domain
+            },
+            (response) => {
+              if (chrome.runtime.lastError) {
+                reject(new Error('Extension connection error: ' + chrome.runtime.lastError.message));
+                return;
+              }
 
-            if (response && response.success) {
-              resolve(response.data);
-            } else {
-              reject(new Error(response?.error || 'Request failed or was rejected'));
+              if (response && response.success) {
+                resolve(response.data);
+              } else {
+                reject(new Error(response?.error || 'Request failed or was rejected'));
+              }
             }
-          }
         );
       } catch (error) {
         reject(new Error('SMID extension not found or connection error'));
