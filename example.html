@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMID Auth Code Example</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+    #status { margin: 10px 0; }
+    pre { background: #f5f5f5; padding: 10px; overflow: auto; }
+  </style>
+</head>
+<body>
+<h1>SMID Auth Code Example</h1>
+<div id="extensionStatus"></div>
+
+<form id="authForm">
+  <input type="text" id="subdomain" placeholder="SmartSchool subdomain" required>
+  <span id="domainPreview">.smartschool.be</span>
+  <button type="submit" id="submitBtn" disabled>Get Auth Code</button>
+</form>
+
+<div id="status"></div>
+<div id="result">
+  <pre id="response">No data yet</pre>
+</div>
+
+<script src="/smid-client.js"></script>
+<script>
+  const client = new SMIDClient();
+  const elements = {
+    subdomain: document.getElementById('subdomain'),
+    domainPreview: document.getElementById('domainPreview'),
+    form: document.getElementById('authForm'),
+    response: document.getElementById('response'),
+    status: document.getElementById('status'),
+    submitBtn: document.getElementById('submitBtn'),
+    extensionStatus: document.getElementById('extensionStatus')
+  };
+
+  elements.subdomain.addEventListener('input', () => {
+    const value = elements.subdomain.value.toLowerCase().trim().replace(/[^a-z0-9-]/g, '');
+    elements.subdomain.value = value;
+    elements.domainPreview.textContent = value ? `${value}.smartschool.be` : ".smartschool.be";
+  });
+
+  async function checkExtension() {
+    try {
+      const isAvailable = await client.checkExtension();
+      elements.extensionStatus.textContent = isAvailable ?
+              "✓ SMID Extension Detected" :
+              "✗ SMID Extension Not Detected - Please install it first";
+      elements.submitBtn.disabled = !isAvailable;
+      return isAvailable;
+    } catch (error) {
+      elements.extensionStatus.textContent = `Error: ${error.message}`;
+      elements.submitBtn.disabled = true;
+      return false;
+    }
+  }
+
+  async function openSmartschoolTab(domain) {
+    elements.status.textContent = `Opening ${domain} in a new tab...`;
+    const newTab = window.open(`https://${domain}`, '_blank');
+    if (newTab) newTab.focus();
+    return new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  async function requestAuthCode(domain, retry = true) {
+    try {
+      elements.status.textContent = `Requesting auth for ${domain}, check the tab.`;
+      const result = await client.getAuthCode(domain);
+      elements.response.textContent = JSON.stringify(result, null, 2);
+      elements.status.textContent = 'Success';
+      return result;
+    } catch (error) {
+      if (retry && error.message === "No active tab found for the specified domain") {
+        elements.status.textContent = "No active tab found. Opening Smartschool...";
+        await openSmartschoolTab(domain);
+        return requestAuthCode(domain, false);
+      }
+      throw error;
+    }
+  }
+
+  elements.form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const subdomain = elements.subdomain.value.trim();
+
+    if (!subdomain) {
+      elements.status.textContent = 'Please enter a subdomain';
+      return;
+    }
+
+    elements.status.textContent = 'Loading...';
+    elements.submitBtn.disabled = true;
+
+    try {
+      if (!await checkExtension()) throw new Error("SMID extension not available");
+
+      const fullDomain = `${subdomain}.smartschool.be`;
+      await requestAuthCode(fullDomain);
+    } catch (error) {
+      elements.response.textContent = `Error: ${error.message}`;
+      elements.status.textContent = `Error: ${error.message}`;
+    } finally {
+      elements.submitBtn.disabled = false;
+    }
+  });
+
+  setTimeout(checkExtension, 500);
+</script>
+</body>
+</html>

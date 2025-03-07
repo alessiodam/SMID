@@ -597,18 +597,18 @@
           if (isAvailable) {
             extensionStatusEl.className = 'extension-status available';
             extensionStatusEl.innerHTML = `
-              <strong>✓ SMID Extension Detected</strong>
-              <p>The SMID extension is installed and ready to use.</p>
-            `;
+          <strong>✓ SMID Extension Detected</strong>
+          <p>The SMID extension is installed and ready to use.</p>
+        `;
             submitBtn.disabled = false;
             updateOpenSmartschoolButton();
             addLogEntry("SMID extension is available", "success");
           } else {
             extensionStatusEl.className = 'extension-status not-available';
             extensionStatusEl.innerHTML = `
-              <strong>✗ SMID Extension Not Detected</strong>
-              <p>Please install the <a href="https://github.com/alessiodam/SMID-auth-extension/releases/latest" target="_blank" rel="noopener noreferrer" style="color: white">SMID extension from the Chrome Web Store</a>.</p>
-            `;
+          <strong>✗ SMID Extension Not Detected</strong>
+          <p>Please install the <a href="https://github.com/alessiodam/SMID-auth-extension/releases/latest" target="_blank" rel="noopener noreferrer" style="color: white">SMID extension from the Chrome Web Store</a>.</p>
+        `;
             submitBtn.disabled = true;
             addLogEntry("SMID extension is not available", "error");
           }
@@ -618,9 +618,9 @@
           extensionStatusEl.style.display = 'block';
           extensionStatusEl.className = 'extension-status not-available';
           extensionStatusEl.innerHTML = `
-            <strong>✗ Error Checking Extension</strong>
-            <p>${error.message}</p>
-          `;
+        <strong>✗ Error Checking Extension</strong>
+        <p>${error.message}</p>
+      `;
           submitBtn.disabled = true;
           addLogEntry(`Error checking extension: ${error.message}`, "error");
           return false;
@@ -628,6 +628,34 @@
       }
 
       checkExtensionBtn.addEventListener('click', checkExtension);
+
+      async function openSmartschoolTab(domain) {
+        const url = `https://${domain}`;
+        addLogEntry(`Opening ${url} in a new tab and focusing...`, 'info');
+        const newTab = window.open(url, '_blank');
+        if (newTab) newTab.focus();
+        addLogEntry('Waiting 1 second before retrying...', 'info');
+        return new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      async function requestAuthCode(domain, retry = true) {
+        try {
+          addLogEntry(`Requesting authentication for domain: ${domain}`);
+          showAuthPopup();
+          addLogEntry("Waiting for auth code from extension...");
+          const authResult = await smidClient.getAuthCode(domain);
+          return authResult;
+        } catch (error) {
+          if (retry && error.message === "No active tab found for the specified domain") {
+            addLogEntry(`Error: ${error.message}`, 'error');
+            addLogEntry('Opening Smartschool tab and retrying...', 'info');
+            await openSmartschoolTab(domain);
+            addLogEntry('Retrying authorization request...', 'info');
+            return requestAuthCode(domain, false);
+          }
+          throw error;
+        }
+      }
 
       authForm.addEventListener('submit', async function(event) {
         event.preventDefault();
@@ -647,11 +675,7 @@
           if (!isExtensionAvailable) {
             throw new Error("SMID extension is not available. Please install it first.");
           }
-
-          addLogEntry(`Requesting authentication for domain: ${fullDomain}`);
-          showAuthPopup();
-          addLogEntry("Waiting for auth code from extension...");
-          const authResult = await smidClient.getAuthCode(fullDomain);
+          const authResult = await requestAuthCode(fullDomain);
 
           if (!authResult || !authResult.code) {
             throw new Error("Failed to get authorization code from extension");
@@ -700,16 +724,16 @@
       copyBtn.addEventListener('click', function() {
         const textToCopy = rawResponse.textContent;
         navigator.clipboard.writeText(textToCopy)
-          .then(() => {
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = 'Copied!';
-            setTimeout(() => {
-              copyBtn.textContent = originalText;
-            }, 2000);
-          })
-          .catch(err => {
-            console.error('Failed to copy: ', err);
-          });
+                .then(() => {
+                  const originalText = copyBtn.textContent;
+                  copyBtn.textContent = 'Copied!';
+                  setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                  }, 2000);
+                })
+                .catch(err => {
+                  console.error('Failed to copy: ', err);
+                });
       });
 
       function showStatus(message, type) {

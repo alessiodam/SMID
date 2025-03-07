@@ -25,6 +25,9 @@ import (
 //go:embed index.html
 var indexHTML string
 
+//go:embed example.html
+var exampleHTML string
+
 //go:embed smid-client.js
 var SMIDClientJS string
 
@@ -87,8 +90,13 @@ func main() {
 		return c.Type("html").SendString(indexHTML)
 	})
 
+	app.Get("/example.html", func(c *fiber.Ctx) error {
+		return c.Type("html").SendString(exampleHTML)
+	})
+
 	app.Get("/smid-client.js", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "application/javascript")
+		c.Set("Cross-Origin-Resource-Policy", "cross-origin")
 		return c.SendString(SMIDClientJS)
 	})
 
