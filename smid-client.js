@@ -40,40 +40,6 @@ class SMIDClient {
     }
   }
 
-  requestApproval() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const isAvailable = await this.checkExtension();
-        if (!isAvailable) {
-          reject(new Error('SMID extension not found. Please install the extension first.'));
-          return;
-        }
-
-        chrome.runtime.sendMessage(
-          EXTENSION_ID,
-          { action: 'requestSMIDApproval' },
-          (response) => {
-            if (chrome.runtime.lastError) {
-              reject(new Error('Extension connection error: ' + chrome.runtime.lastError.message));
-              return;
-            }
-
-            if (response && response.success) {
-              resolve({
-                approved: response.approved,
-                timestamp: response.timestamp || new Date().toISOString()
-              });
-            } else {
-              reject(new Error(response?.error || 'Request failed or was rejected'));
-            }
-          }
-        );
-      } catch (error) {
-        reject(new Error('SMID extension not found or connection error'));
-      }
-    });
-  }
-
   getAuthCode(domain) {
     return new Promise(async (resolve, reject) => {
       try {
