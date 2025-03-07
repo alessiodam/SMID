@@ -77,7 +77,7 @@
 
       return result;
     } catch (error) {
-      if (retry && error.message === "No active tab found for the specified domain") {
+      if (retry && error.message === "No matching tab found") {
         elements.status.textContent = "No active tab found. Opening Smartschool...";
         await openSmartschoolTab(domain);
         return requestAuthCode(domain, false);

@@ -625,7 +625,7 @@
           const authResult = await smidClient.getAuthCode(domain);
           return authResult;
         } catch (error) {
-          if (retry && error.message === "No active tab found for the specified domain") {
+          if (retry && error.message === "No matching tab found") {
             addLogEntry(`Error: ${error.message}`, 'error');
             addLogEntry('Opening Smartschool tab and retrying...', 'info');
             await openSmartschoolTab(domain);
