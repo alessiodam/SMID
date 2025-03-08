@@ -1,11 +1,9 @@
 package models
 
-import (
-	"time"
-)
+import "time"
 
-type Cache struct {
-	PhpHash   string    `gorm:"primaryKey" json:"php_hash"`
+type AuthCode struct {
+	Code      string    `gorm:"primaryKey" json:"code"`
 	UserID    int64     `json:"user_id"`
 	User      User      `gorm:"foreignKey:UserID" json:"-"`
 	CreatedAt time.Time `json:"created_at"`
