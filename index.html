@@ -34,6 +34,7 @@
         </div>
 
         <button type="submit" id="submitBtn" disabled>Get User ID</button>
+        <button type="button" id="openDashboardBtn" disabled>Open dashboard</button>
       </form>
 
       <div class="loading" id="loading">
@@ -85,7 +86,6 @@
     </div>
   </div>
 
-  <!-- Authorization Popup -->
   <div class="popup-overlay" id="authPopup">
     <div class="popup-content">
       <h2 class="popup-title">Authorization in Progress</h2>
@@ -119,6 +119,7 @@
       const statusEl = document.getElementById('status');
       const loadingEl = document.getElementById('loading');
       const submitBtn = document.getElementById('submitBtn');
+      const openDashboardBtn = document.getElementById('openDashboardBtn');
       const copyBtn = document.getElementById('copyBtn');
       const requestLogEl = document.getElementById('requestLog');
       const checkExtensionBtn = document.getElementById('checkExtensionBtn');
@@ -248,6 +249,11 @@
             throw new Error("Failed to get authorization code from extension");
           }
 
+          if (authResult.token) {
+            document.cookie = `token=${authResult.token}; path=/; secure; samesite=strict`;
+            openDashboardBtn.disabled = false;
+          }
+
           addLogEntry(`Received authorization code: ${authResult.code.substring(0, 8)}...`, 'success');
           hideAuthPopup();
           rawResponse.textContent = JSON.stringify(authResult, null, 2);
@@ -287,6 +293,16 @@
           addLogEntry('Request process completed');
         }
       });
+
+      openDashboardBtn.addEventListener('click', function() {
+            const token = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, "$1");
+            if (token) {
+              window.location.href = "/dashboard";
+            } else {
+                showStatus('No token found. Please authenticate first.', 'error');
+                openDashboardBtn.disabled = true;
+            }
+        });
 
       copyBtn.addEventListener('click', function() {
         const textToCopy = rawResponse.textContent;
