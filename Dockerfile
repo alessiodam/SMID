@@ -37,6 +37,7 @@ ARG VERSION
 ENV VERSION=$VERSION
 
 COPY --from=build /bin/server /bin/
+COPY --from=build /src/*.html /bin/
 
 EXPOSE ${PORT:-8000}
 
