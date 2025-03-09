@@ -11,7 +11,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 	if token == "" {
 		token = c.Cookies("token")
 		if token == "" {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "missing token"})
+			return c.Redirect("/")
 		}
 	} else {
 		token = strings.TrimPrefix(token, "Bearer ")
@@ -19,7 +19,7 @@ func AuthMiddleware(c *fiber.Ctx) error {
 
 	user, err := utils.GetUserByJWT(token)
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid token"})
+		return c.Redirect("/")
 	}
 
 	c.Locals("user", user)
