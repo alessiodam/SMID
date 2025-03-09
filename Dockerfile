@@ -14,6 +14,8 @@ RUN CGO_ENABLED=0 GOARCH=$TARGETARCH go build -ldflags="-s -w" -o /bin/server ./
 
 FROM alpine:latest AS final
 
+WORKDIR /app
+
 RUN --mount=type=cache,target=/var/cache/apk \
     apk --update add \
         ca-certificates \
@@ -36,9 +38,9 @@ ARG PORT
 ARG VERSION
 ENV VERSION=$VERSION
 
-COPY --from=build /bin/server /bin/
-COPY --from=build /src/*.html /bin/
+COPY --from=build /bin/server /app/
+COPY --from=build /src/*.html /app/
 
 EXPOSE ${PORT:-8000}
 
-ENTRYPOINT [ "/bin/server", "serve" ]
+ENTRYPOINT [ "/app/server", "serve" ]
