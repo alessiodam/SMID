@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -64,12 +65,16 @@ func AuthCodeHandler(c *fiber.Ctx) error {
 		var user models.User
 		result := db.DB.Where("upstream_id = ?", upstreamID).First(&user)
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			newUserID := snowflakeNode.Generate().Int64()
 			user = models.User{
-				ID:         snowflakeNode.Generate().Int64(),
-				UpstreamID: upstreamID,
-				CreatedAt:  time.Now(),
+				ID:                    newUserID,
+				UpstreamID:            upstreamID,
+				Username:              fmt.Sprintf("user_%d", newUserID),
+				DisplayName:           fmt.Sprintf("User %d", newUserID),
+				LastUsernameChange:    time.Unix(0, 0),
+				LastDisplayNameChange: time.Unix(0, 0),
 			}
-			if err := db.DB.Create(&user).Error; err != nil {
+			if err = db.DB.Create(&user).Error; err != nil {
 				return respondError(c, http.StatusInternalServerError, err)
 			}
 		} else if result.Error != nil {
@@ -94,7 +99,19 @@ func AuthCodeHandler(c *fiber.Ctx) error {
 		return respondError(c, http.StatusInternalServerError, err)
 	}
 
-	return c.JSON(fiber.Map{"code": code, "source": source})
+	token, err := utils.CreateJWTToken(userID)
+	if err != nil {
+		return respondError(c, http.StatusInternalServerError, err)
+	}
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "token",
+		Value:    token,
+		Expires:  time.Now().Add(12 * time.Hour),
+		HTTPOnly: true,
+	})
+
+	return c.JSON(fiber.Map{"code": code, "source": source, "token": token})
 }
 
 func UserIdHandler(c *fiber.Ctx) error {
@@ -104,7 +121,7 @@ func UserIdHandler(c *fiber.Ctx) error {
 	}
 
 	var authCode models.AuthCode
-	if err := db.DB.Where("code = ?", code).First(&authCode).Error; err != nil {
+	if err := db.DB.Where("code = ?", code).Preload("User").First(&authCode).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return respondError(c, http.StatusNotFound, errors.New("code not found"))
 		}
@@ -115,7 +132,11 @@ func UserIdHandler(c *fiber.Ctx) error {
 		db.DB.Delete(&authCode)
 		return respondError(c, http.StatusUnauthorized, errors.New("code expired"))
 	}
-	return c.JSON(fiber.Map{"user_id": authCode.UserID})
+	return c.JSON(fiber.Map{
+		"user_id":      authCode.UserID,
+		"username":     authCode.User.Username,
+		"display_name": authCode.User.DisplayName,
+	})
 }
 
 func getCachedUser(phpHash string) (int64, error) {

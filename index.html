@@ -7,419 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-primary: #121212;
-      --bg-secondary: #1e1e1e;
-      --bg-tertiary: #2e2e2e;
-      --text-primary: #ffffff;
-      --text-secondary: #e0e0e0;
-      --accent: #4fc3f7;
-      --accent-hover: #29b6f6;
-      --error: #ff5252;
-      --success: #4caf50;
-      --info: #ffb74d;
-      --border-radius: 8px;
-      --spacing-xs: 4px;
-      --spacing-sm: 8px;
-      --spacing-md: 16px;
-      --spacing-lg: 24px;
-      --spacing-xl: 32px;
-      --transition: all 0.2s ease;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      line-height: 1.6;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    header {
-      background-color: var(--bg-secondary);
-      padding: var(--spacing-lg);
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      position: relative;
-      z-index: 10;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-    }
-
-    h2 {
-      font-size: 1.4rem;
-      margin-bottom: var(--spacing-md);
-      color: var(--accent);
-      border-bottom: 1px solid var(--accent);
-      padding-bottom: var(--spacing-xs);
-    }
-
-    h3 {
-      font-size: 1.1rem;
-      margin: var(--spacing-lg) 0 var(--spacing-sm);
-    }
-
-    .container {
-      flex: 1;
-      display: flex;
-      padding: var(--spacing-lg);
-      gap: var(--spacing-lg);
-      max-width: 1200px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .card {
-      background-color: var(--bg-secondary);
-      border-radius: var(--border-radius);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      padding: var(--spacing-lg);
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .form-group {
-      margin-bottom: var(--spacing-md);
-    }
-
-    label {
-      display: block;
-      margin-bottom: var(--spacing-xs);
-      font-weight: 500;
-    }
-
-    input {
-      width: 100%;
-      padding: var(--spacing-md);
-      background-color: var(--bg-tertiary);
-      border: 1px solid var(--bg-tertiary);
-      border-radius: var(--border-radius);
-      color: var(--text-primary);
-      font-size: 1rem;
-      transition: var(--transition);
-    }
-
-    input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.3);
-    }
-
-    button {
-      background-color: var(--accent);
-      color: #000;
-      border: none;
-      padding: var(--spacing-md);
-      border-radius: var(--border-radius);
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      margin-top: var(--spacing-md);
-    }
-
-    button:hover {
-      background-color: var(--accent-hover);
-    }
-
-    button:disabled {
-      background-color: var(--bg-tertiary);
-      color: var(--text-secondary);
-      cursor: not-allowed;
-    }
-
-    .domain-preview {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      margin-top: var(--spacing-xs);
-    }
-
-    .domain-value {
-      color: var(--accent);
-      font-weight: 500;
-    }
-
-    pre {
-      background-color: var(--bg-tertiary);
-      padding: var(--spacing-md);
-      border-radius: var(--border-radius);
-      overflow-x: auto;
-      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-      font-size: 0.9rem;
-      margin-top: var(--spacing-sm);
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .api-endpoint {
-      background-color: var(--bg-tertiary);
-      padding: var(--spacing-md);
-      border-radius: var(--border-radius);
-      margin: var(--spacing-sm) 0 var(--spacing-lg);
-      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-      overflow-x: auto;
-    }
-
-    .status {
-      margin-top: var(--spacing-md);
-      padding: var(--spacing-md);
-      border-radius: var(--border-radius);
-      display: none;
-    }
-
-    .status.error {
-      background-color: rgba(255, 82, 82, 0.2);
-      color: var(--error);
-      border: 1px solid var(--error);
-    }
-
-    .status.success {
-      background-color: rgba(76, 175, 80, 0.2);
-      color: var(--success);
-      border: 1px solid var(--success);
-    }
-
-    .status.info {
-      background-color: rgba(255, 183, 77, 0.2);
-      color: var(--info);
-      border: 1px solid var(--info);
-    }
-
-    .loading {
-      display: none;
-      align-items: center;
-      justify-content: center;
-      margin-top: var(--spacing-md);
-    }
-
-    .loading-spinner {
-      border: 3px solid rgba(79, 195, 247, 0.3);
-      border-radius: 50%;
-      border-top: 3px solid var(--accent);
-      width: 24px;
-      height: 24px;
-      animation: spin 1s linear infinite;
-      margin-right: var(--spacing-sm);
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .response-container {
-      margin-top: var(--spacing-lg);
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .response-container h3 {
-      margin-top: 0;
-    }
-
-    .response-wrapper {
-      flex: 1;
-      overflow: auto;
-    }
-
-    .copy-btn {
-      background-color: var(--bg-tertiary);
-      color: var(--text-secondary);
-      border: 1px solid var(--bg-tertiary);
-      padding: var(--spacing-xs) var(--spacing-sm);
-      border-radius: var(--border-radius);
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: var(--transition);
-      margin-left: auto;
-      display: inline-block;
-    }
-
-    .copy-btn:hover {
-      background-color: var(--accent);
-      color: #000;
-    }
-
-    .header-with-actions {
-      display: flex;
-      align-items: center;
-      margin-bottom: var(--spacing-sm);
-    }
-
-    .log-container {
-      margin-top: var(--spacing-lg);
-      border-top: 1px solid var(--bg-tertiary);
-      padding-top: var(--spacing-md);
-    }
-
-    .log-entry {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      margin-bottom: var(--spacing-xs);
-    }
-
-    .log-entry .timestamp {
-      color: var(--accent);
-      margin-right: var(--spacing-xs);
-    }
-
-    footer {
-      background-color: var(--bg-secondary);
-      padding: var(--spacing-md);
-      text-align: center;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-
-    footer a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-    .popup-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      visibility: hidden;
-      opacity: 0;
-      transition: visibility 0s linear 0.25s, opacity 0.25s;
-    }
-
-    .popup-overlay.active {
-      visibility: visible;
-      opacity: 1;
-      transition-delay: 0s;
-    }
-
-    .popup-content {
-      background-color: var(--bg-secondary);
-      border-radius: var(--border-radius);
-      padding: var(--spacing-xl);
-      width: 90%;
-      max-width: 500px;
-      text-align: center;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      position: relative;
-    }
-
-    .popup-loader {
-      margin: var(--spacing-xl) auto;
-      position: relative;
-      width: 80px;
-      height: 80px;
-    }
-
-    .popup-loader-circle {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border: 6px solid transparent;
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 1.2s linear infinite;
-    }
-
-    .popup-loader-circle:nth-child(2) {
-      border-top-color: transparent;
-      border-right-color: var(--accent);
-      animation-delay: 0.3s;
-    }
-
-    .popup-loader-circle:nth-child(3) {
-      border-top-color: transparent;
-      border-right-color: transparent;
-      border-bottom-color: var(--accent);
-      animation-delay: 0.6s;
-    }
-
-    .popup-title {
-      font-size: 1.5rem;
-      margin-bottom: var(--spacing-md);
-      color: var(--accent);
-    }
-
-    .popup-message {
-      margin-bottom: var(--spacing-lg);
-      font-size: 1.1rem;
-    }
-
-    .popup-note {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      margin-top: var(--spacing-lg);
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-        padding: var(--spacing-md);
-      }
-
-      header {
-        padding: var(--spacing-md);
-      }
-
-      h1 {
-        font-size: 1.5rem;
-      }
-
-      .card {
-        padding: var(--spacing-md);
-      }
-
-      pre, .api-endpoint {
-        font-size: 0.8rem;
-      }
-
-      .popup-content {
-        padding: var(--spacing-lg);
-      }
-    }
-
-    /* Extension check status */
-    .extension-status {
-      margin-bottom: var(--spacing-md);
-      padding: var(--spacing-md);
-      border-radius: var(--border-radius);
-    }
-
-    .extension-status.available {
-      background-color: rgba(76, 175, 80, 0.2);
-      color: var(--success);
-      border: 1px solid var(--success);
-    }
-
-    .extension-status.not-available {
-      background-color: rgba(255, 82, 82, 0.2);
-      color: var(--error);
-      border: 1px solid var(--error);
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <header>
@@ -446,6 +34,7 @@
         </div>
 
         <button type="submit" id="submitBtn" disabled>Get User ID</button>
+        <button type="button" id="openDashboardBtn" disabled>Open dashboard</button>
       </form>
 
       <div class="loading" id="loading">
@@ -497,7 +86,6 @@
     </div>
   </div>
 
-  <!-- Authorization Popup -->
   <div class="popup-overlay" id="authPopup">
     <div class="popup-content">
       <h2 class="popup-title">Authorization in Progress</h2>
@@ -531,6 +119,7 @@
       const statusEl = document.getElementById('status');
       const loadingEl = document.getElementById('loading');
       const submitBtn = document.getElementById('submitBtn');
+      const openDashboardBtn = document.getElementById('openDashboardBtn');
       const copyBtn = document.getElementById('copyBtn');
       const requestLogEl = document.getElementById('requestLog');
       const checkExtensionBtn = document.getElementById('checkExtensionBtn');
@@ -660,6 +249,11 @@
             throw new Error("Failed to get authorization code from extension");
           }
 
+          if (authResult.token) {
+            document.cookie = `token=${authResult.token}; path=/; secure; samesite=strict`;
+            openDashboardBtn.disabled = false;
+          }
+
           addLogEntry(`Received authorization code: ${authResult.code.substring(0, 8)}...`, 'success');
           hideAuthPopup();
           rawResponse.textContent = JSON.stringify(authResult, null, 2);
@@ -699,6 +293,16 @@
           addLogEntry('Request process completed');
         }
       });
+
+      openDashboardBtn.addEventListener('click', function() {
+            const token = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, "$1");
+            if (token) {
+              window.location.href = "/dashboard";
+            } else {
+                showStatus('No token found. Please authenticate first.', 'error');
+                openDashboardBtn.disabled = true;
+            }
+        });
 
       copyBtn.addEventListener('click', function() {
         const textToCopy = rawResponse.textContent;

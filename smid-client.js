@@ -15,9 +15,7 @@ class SMIDClient {
               reject(new Error('Extension connection error: ' + chrome.runtime.lastError.message));
               return;
             }
-            console.log(response);
             if (response && response.success) {
-              console.log('SMID Extension version:', response.version);
               resolve(response.version);
             } else {
               reject(new Error(response?.error || 'Request failed or was rejected'));
