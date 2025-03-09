@@ -1,0 +1,29 @@
+name: Deploy to production
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+
+      - name: Run tests
+        run: go test -v ./...
+
+      - name: Deploy to Coolify production environment
+        run: |
+          curl --request GET "${{ secrets.COOLIFY_WEBHOOK_PRODUCTION }}" \
+          --header "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN_PRODUCTION }}"
