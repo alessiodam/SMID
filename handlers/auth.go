@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"log"
@@ -62,13 +63,15 @@ func AuthCodeHandler(c *fiber.Ctx) error {
 			return respondError(c, http.StatusInternalServerError, err)
 		}
 
+		hashedUpstreamID := fmt.Sprintf("%x", sha256.Sum256([]byte(upstreamID)))
+
 		var user models.User
-		result := db.DB.Where("upstream_id = ?", upstreamID).First(&user)
+		result := db.DB.Where("upstream_id = ?", hashedUpstreamID).First(&user)
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			newUserID := snowflakeNode.Generate().Int64()
 			user = models.User{
 				ID:                    newUserID,
-				UpstreamID:            upstreamID,
+				UpstreamID:            hashedUpstreamID,
 				Username:              fmt.Sprintf("user_%d", newUserID),
 				DisplayName:           fmt.Sprintf("User %d", newUserID),
 				LastUsernameChange:    time.Unix(0, 0),
