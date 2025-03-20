@@ -136,9 +136,10 @@ func UserIdHandler(c *fiber.Ctx) error {
 		return respondError(c, http.StatusUnauthorized, errors.New("code expired"))
 	}
 	return c.JSON(fiber.Map{
-		"user_id":      authCode.UserID,
-		"username":     authCode.User.Username,
-		"display_name": authCode.User.DisplayName,
+		"user_id":            authCode.UserID,
+		"username":           authCode.User.Username,
+		"display_name":       authCode.User.DisplayName,
+		"hashed_upstream_id": authCode.User.UpstreamID,
 	})
 }
 
