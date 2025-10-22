@@ -2,10 +2,11 @@ package utils
 
 import (
 	"errors"
-	"github.com/alessiodam/SMID/db"
-	"github.com/alessiodam/SMID/models"
 	"os"
 	"time"
+
+	"github.com/alessiodam/SMID/db"
+	"github.com/alessiodam/SMID/models"
 
 	"github.com/golang-jwt/jwt/v4"
 )

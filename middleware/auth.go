@@ -1,15 +1,18 @@
 package middleware
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/alessiodam/SMID/utils"
 	"github.com/gofiber/fiber/v2"
-	"strings"
 )
 
 func AuthMiddleware(c *fiber.Ctx) error {
 	token := c.Get("Authorization")
 	if token == "" {
 		token = c.Cookies("token")
+		fmt.Println("cookie token:", token)
 		if token == "" {
 			return c.Redirect("/")
 		}

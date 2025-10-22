@@ -2,12 +2,13 @@ package db
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/alessiodam/SMID/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
-	"os"
-	"time"
 )
 
 var DB *gorm.DB

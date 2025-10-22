@@ -2,12 +2,13 @@ package main
 
 import (
 	_ "embed"
-	"github.com/alessiodam/SMID/middleware"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/alessiodam/SMID/middleware"
 
 	"github.com/alessiodam/SMID/db"
 	"github.com/alessiodam/SMID/handlers"
@@ -31,9 +32,6 @@ var exampleHTML string
 
 //go:embed smid-client.js
 var SMIDClientJS string
-
-//go:embed styles.css
-var stylesCSS string
 
 func main() {
 	if err := godotenv.Load(); err != nil {
@@ -106,11 +104,6 @@ func main() {
 	app.Get("/smid-client.js", func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "application/javascript")
 		return c.SendString(SMIDClientJS)
-	})
-
-	app.Get("/styles.css", func(c *fiber.Ctx) error {
-		c.Set("Content-Type", "text/css")
-		return c.SendString(stylesCSS)
 	})
 
 	app.Get("/v1/auth-code", handlers.AuthCodeHandler)

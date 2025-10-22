@@ -1,10 +1,11 @@
 package handlers
 
 import (
+	"time"
+
 	"github.com/alessiodam/SMID/db"
 	"github.com/alessiodam/SMID/models"
 	"github.com/gofiber/fiber/v2"
-	"time"
 )
 
 func DashboardGetHandler(c *fiber.Ctx) error {

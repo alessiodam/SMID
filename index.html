@@ -1,348 +1,801 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SMID - Unofficial SmartSchool User ID</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
-  <header>
-    <h1>SMID - Unofficial SmartSchool User ID</h1>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SMID - Unofficial SmartSchool User ID</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-  <div class="container">
-    <div class="card">
-      <h2>Get Your SMID</h2>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0f0f0f;
+        color: #e0e0e0;
+        line-height: 1.6;
+      }
 
-      <div id="extensionStatus" style="display: none;" class="extension-status"></div>
+      header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+        border-bottom: 1px solid #2a2a2a;
+        padding: 2rem 0;
+        margin-bottom: 3rem;
+      }
 
-      <form id="authForm">
-        <div class="form-group">
-          <label for="smartschoolSubdomain">SmartSchool Subdomain:</label>
-          <input
-            type="text"
-            id="smartschoolSubdomain"
-            placeholder="e.g. schoolname"
-            autocomplete="off"
-            required
+      header h1 {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem 3rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+
+      @media (max-width: 768px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        header h1 {
+          font-size: 1.5rem;
+        }
+      }
+
+      section {
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        padding: 2rem;
+        background: #1a1a1a;
+      }
+
+      section h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: #ffffff;
+      }
+
+      section h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+        color: #ffffff;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        opacity: 0.7;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #ffffff;
+        font-size: 0.95rem;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        background: #0f0f0f;
+        color: #e0e0e0;
+        font-family: "Inter", sans-serif;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #4a9eff;
+        box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
+      }
+
+      .domain-preview {
+        font-size: 0.85rem;
+        color: #888;
+        margin-top: 0.5rem;
+      }
+
+      .domain-value {
+        color: #4a9eff;
+        font-weight: 600;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      button {
+        flex: 1;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.95rem;
+        font-family: "Inter", sans-serif;
+      }
+
+      .btn-primary {
+        background: #4a9eff;
+        color: #000;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        background: #3a8ee5;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .btn-secondary {
+        background: #2a2a2a;
+        color: #e0e0e0;
+        border: 1px solid #3a3a3a;
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        background: #3a3a3a;
+        border-color: #4a4a4a;
+      }
+
+      .btn-secondary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .btn-small {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        flex: none;
+      }
+
+      .status {
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        display: none;
+        font-weight: 500;
+      }
+
+      .status.success {
+        background: rgba(52, 211, 153, 0.1);
+        border: 1px solid rgba(52, 211, 153, 0.3);
+        color: #34d399;
+      }
+
+      .status.error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #ef4444;
+      }
+
+      .status.info {
+        background: rgba(74, 158, 255, 0.1);
+        border: 1px solid rgba(74, 158, 255, 0.3);
+        color: #4a9eff;
+      }
+
+      .extension-status {
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+
+      .extension-status.available {
+        background: rgba(52, 211, 153, 0.1);
+        border: 1px solid rgba(52, 211, 153, 0.3);
+        color: #34d399;
+      }
+
+      .extension-status.available strong {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+
+      .extension-status.not-available {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #ef4444;
+      }
+
+      .extension-status.not-available strong {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+
+      .extension-status p {
+        margin: 0.25rem 0;
+      }
+
+      .extension-status a {
+        color: inherit;
+        text-decoration: underline;
+      }
+
+      .response-section {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #2a2a2a;
+      }
+
+      .response-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .response-header h3 {
+        margin: 0;
+      }
+
+      .response-wrapper {
+        background: #0f0f0f;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        padding: 1rem;
+        overflow-x: auto;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      pre {
+        font-size: 0.85rem;
+        color: #a0a0a0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        margin: 0;
+      }
+
+      .log-section {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #2a2a2a;
+      }
+
+      #requestLog {
+        background: #0f0f0f;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        padding: 1rem;
+        max-height: 200px;
+        overflow-y: auto;
+        font-size: 0.8rem;
+      }
+
+      .log-entry {
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        border-radius: 4px;
+      }
+
+      .log-entry.info {
+        color: #888;
+      }
+
+      .log-entry.success {
+        color: #34d399;
+      }
+
+      .log-entry.error {
+        color: #ef4444;
+      }
+
+      .log-entry .timestamp {
+        color: #666;
+        font-weight: 600;
+      }
+
+      .developer-section p {
+        margin-bottom: 1rem;
+        color: #b0b0b0;
+      }
+
+      .developer-section ol {
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+        color: #b0b0b0;
+      }
+
+      .developer-section li {
+        margin-bottom: 0.5rem;
+      }
+
+      .api-endpoint {
+        background: #0f0f0f;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        font-family: "Courier New", monospace;
+        font-size: 0.85rem;
+        color: #4a9eff;
+        word-break: break-all;
+      }
+
+      footer {
+        width: 100%;
+        margin-top: 3rem;
+        padding: 2rem 1.5rem;
+        border-top: 1px solid #2a2a2a;
+        text-align: center;
+        font-size: 0.85rem;
+        color: #666;
+      }
+
+      footer p {
+        margin: 0.5rem 0;
+      }
+
+      footer a {
+        color: #4a9eff;
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+
+      .loading {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2rem 0;
+        color: #888;
+      }
+
+      .loading.active {
+        display: flex;
+      }
+
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .popup-overlay.active {
+        display: flex;
+      }
+
+      .popup-content {
+        background: #1a1a1a;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        padding: 2rem;
+        max-width: 400px;
+        text-align: center;
+      }
+
+      .popup-content h2 {
+        margin-bottom: 1rem;
+      }
+
+      .popup-content p {
+        color: #b0b0b0;
+        margin-bottom: 1.5rem;
+      }
+
+      .popup-loader {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .popup-loader-circle {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #4a9eff;
+      }
+
+      .popup-note {
+        font-size: 0.85rem;
+        color: #888;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>SMID — Get Your SmartSchool User ID</h1>
+    </header>
+    <div class="container">
+      <div class="grid">
+        <section>
+          <h2>Get Your SMID</h2>
+          <div
+            id="extensionStatus"
+            class="extension-status"
+            style="display: none"
+          ></div>
+          <form id="authForm">
+            <div class="form-group">
+              <label for="smartschoolSubdomain">SmartSchool Subdomain</label>
+              <input
+                type="text"
+                id="smartschoolSubdomain"
+                placeholder="e.g. schoolname"
+                autocomplete="off"
+                required
+              />
+              <p class="domain-preview">
+                Full domain:
+                <span class="domain-value" id="domainPreview"
+                  >.smartschool.be</span
+                >
+              </p>
+            </div>
+            <div class="button-group">
+              <button type="submit" class="btn-primary" id="submitBtn" disabled>
+                Get User ID
+              </button>
+              <button
+                type="button"
+                class="btn-secondary"
+                id="openDashboardBtn"
+                disabled
+              >
+                Dashboard
+              </button>
+            </div>
+          </form>
+          <div id="status" class="status"></div>
+          <div id="loading" class="loading">
+            <span>Processing...</span>
+          </div>
+          <div class="response-section">
+            <div class="response-header">
+              <h3>Response</h3>
+              <button class="btn-secondary btn-small" id="copyBtn">Copy</button>
+            </div>
+            <div class="response-wrapper">
+              <pre id="rawResponse">
+No data yet. Submit the form to see results.</pre
+              >
+            </div>
+          </div>
+          <div class="log-section">
+            <h3>Request Log</h3>
+            <div id="requestLog"></div>
+          </div>
+        </section>
+        <section class="developer-section">
+          <h2>For Developers</h2>
+          <p>
+            This tool helps you retrieve your SmartSchool user ID using the SMID
+            extension. It's designed to be simple, secure, and
+            developer-friendly.
+          </p>
+          <h3>Quick Start</h3>
+          <ol>
+            <li>
+              Install the
+              <a
+                href="https://chromewebstore.google.com/detail/poohpalffkmnicfcmdjofoaeagghgmdc"
+                target="_blank"
+                rel="noopener noreferrer"
+                >SMID Chrome extension</a
+              >
+            </li>
+            <li>Log in to your SmartSchool account</li>
+            <li>Enter your school's subdomain on the left</li>
+            <li>Click "Get User ID" and accept the authorization</li>
+          </ol>
+          <h3>API Reference</h3>
+          <p>Exchange your authorization code for a user ID:</p>
+          <div class="api-endpoint">GET /v1/user-id?code=AUTH_CODE</div>
+          <p style="font-size: 0.85rem; color: #888">
+            💡 Tip: Always do this request on your server, never expose codes in
+            client-side code.
+          </p>
+          <h3>Security</h3>
+          <p>
+            The SMID extension securely interacts with your active SmartSchool
+            session without storing or transmitting your login credentials. Your
+            session remains private to your browser.
+          </p>
+          <h3>Example</h3>
+          <p>
+            <a href="/example.html" style="color: #4a9eff"
+              >View minimal integration example</a
+            >
+          </p>
+          <h3>Check Extension</h3>
+          <button
+            class="btn-secondary"
+            id="checkExtensionBtn"
+            style="width: 100%"
           >
-          <p class="domain-preview">Full Domain: <span class="domain-value" id="domainPreview">.smartschool.be</span></p>
-        </div>
-
-        <button type="submit" id="submitBtn" disabled>Get User ID</button>
-        <button type="button" id="openDashboardBtn" disabled>Open dashboard</button>
-      </form>
-
-      <div class="loading" id="loading">
-        <div class="loading-spinner"></div>
-        <span>Processing request...</span>
-      </div>
-
-      <div class="status" id="status"></div>
-
-      <div class="response-container">
-        <div class="header-with-actions">
-          <h3>Response:</h3>
-          <button class="copy-btn" id="copyBtn">Copy</button>
-        </div>
-        <div class="response-wrapper">
-          <pre id="rawResponse">No data yet. Submit the form to see results.</pre>
-        </div>
-      </div>
-
-      <div class="log-container">
-        <h3>Request Log:</h3>
-        <div id="requestLog"></div>
+            Verify SMID Extension
+          </button>
+        </section>
       </div>
     </div>
 
-    <div class="card">
-      <h2>For Developers</h2>
-      <p>This tool helps you retrieve your SmartSchool user ID using the SMID extension.</p>
+    <div class="popup-overlay" id="authPopup">
+      <div class="popup-content">
+        <h2>Authorizing...</h2>
+        <p>
+          Please check your SmartSchool page and accept the authorization
+          request.
+        </p>
 
-      <h3>How to use:</h3>
-      <ol>
-        <li>Make sure you have the SMID Chrome extension installed</li>
-        <li>Login to your SmartSchool account in another tab</li>
-        <li>Enter your school's subdomain in the form</li>
-        <li>Click "Get User ID" to start the authentication process</li>
-        <li>Accept the authorization request that appears on your SmartSchool page</li>
-      </ol>
-      <p><a href="/example.html" style="color: white;">Example page (minimal code)</a></p>
+        <div class="popup-loader">
+          <div class="popup-loader-circle"></div>
+          <div class="popup-loader-circle"></div>
+          <div class="popup-loader-circle"></div>
+        </div>
 
-      <h3>API Endpoints:</h3>
-      <p>Request user ID (should be done on server):</p>
-      <div class="api-endpoint">GET https://smid.alessiodam.dev/v1/user-id?code=THE_AUTH_CODE</div>
-
-      <h3>Security Note:</h3>
-      <p>This extension securely interacts with your active SmartSchool session without storing your login credentials. Your SmartSchool session is never exposed to this website.</p>
-
-      <h3>Extension Status:</h3>
-      <button id="checkExtensionBtn">Check SMID Extension</button>
-    </div>
-  </div>
-
-  <div class="popup-overlay" id="authPopup">
-    <div class="popup-content">
-      <h2 class="popup-title">Authorization in Progress</h2>
-      <p class="popup-message">Please check your SmartSchool page and accept the authorization request.</p>
-
-      <div class="popup-loader">
-        <div class="popup-loader-circle"></div>
-        <div class="popup-loader-circle"></div>
-        <div class="popup-loader-circle"></div>
+        <p class="popup-note">
+          If you don't see a request, ensure you're logged into SmartSchool and
+          try again.
+        </p>
       </div>
-
-      <p class="popup-note">If you don't see a request, make sure you're logged into SmartSchool and try again.</p>
     </div>
-  </div>
-
-  <footer>
-    <p>SMID is an unofficial tool and is not affiliated with SmartSchool.</p>
-    <p>Built and hosted by <a href="https://www.alessiodam.dev/" target="_blank" rel="noopener noreferrer">Alessio D'Ambrosio</a></p>
-    <p>Server source: <a href="https://github.com/alessiodam/SMID" target="_blank" rel="noopener noreferrer">https://github.com/alessiodam/SMID</a></p>
-    <p>Current time: <span id="currentTime"></span></p>
-  </footer>
-
-  <script src="/smid-client.js"></script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const subdomainInput = document.getElementById('smartschoolSubdomain');
-      const domainPreview = document.getElementById('domainPreview');
-      const authForm = document.getElementById('authForm');
-      const rawResponse = document.getElementById('rawResponse');
-      const statusEl = document.getElementById('status');
-      const loadingEl = document.getElementById('loading');
-      const submitBtn = document.getElementById('submitBtn');
-      const openDashboardBtn = document.getElementById('openDashboardBtn');
-      const copyBtn = document.getElementById('copyBtn');
-      const requestLogEl = document.getElementById('requestLog');
-      const checkExtensionBtn = document.getElementById('checkExtensionBtn');
-      const extensionStatusEl = document.getElementById('extensionStatus');
-      const authPopup = document.getElementById('authPopup');
-      const currentTimeEl = document.getElementById('currentTime');
-
-      const smidClient = new SMIDClient();
-
-      const now = new Date();
-      currentTimeEl.textContent = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
-
-      subdomainInput.addEventListener('input', function() {
-        let subdomain = subdomainInput.value.toLowerCase().trim();
-        subdomain = subdomain.replace(/[^a-z0-9-]/g, '');
-        subdomainInput.value = subdomain;
-        domainPreview.textContent = subdomain ? `${subdomain}.smartschool.be` : ".smartschool.be";
-      });
-
-      function addLogEntry(message, type = 'info') {
-        const now = new Date();
-        const timestamp = now.toLocaleTimeString();
-        const logEntry = document.createElement('div');
-        logEntry.className = `log-entry ${type}`;
-        logEntry.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
-        requestLogEl.appendChild(logEntry);
-        requestLogEl.scrollTop = requestLogEl.scrollHeight;
-      }
-
-      function showAuthPopup() {
-        authPopup.classList.add('active');
-      }
-
-      function hideAuthPopup() {
-        authPopup.classList.remove('active');
-      }
-
-      async function checkExtension() {
-        try {
-          addLogEntry("Checking SMID extension availability...");
-          const isAvailable = await smidClient.checkExtension();
-          extensionStatusEl.style.display = 'block';
-          if (isAvailable) {
-            const version = await smidClient.getExtensionVersion();
-            extensionStatusEl.className = 'extension-status available';
-            extensionStatusEl.innerHTML = `
-              <strong>✓ SMID Extension Detected</strong>
-              <p>The SMID extension is installed and ready to use.</p>
-              <p>Version: ${version}</p>
-            `;
-            submitBtn.disabled = false;
-            addLogEntry("SMID extension is available, version: " + version, "success");
-          } else {
-            extensionStatusEl.className = 'extension-status not-available';
-            extensionStatusEl.innerHTML = `
-              <strong>✗ SMID Extension Not Detected</strong>
-              <p>Please install the <a href="https://chromewebstore.google.com/detail/poohpalffkmnicfcmdjofoaeagghgmdc" target="_blank" rel="noopener noreferrer" style="color: white">SMID extension from the Chrome Web Store</a>.</p>
-            `;
-            submitBtn.disabled = true;
-            addLogEntry("SMID extension is not available", "error");
-          }
-          return isAvailable;
-        } catch (error) {
-          extensionStatusEl.style.display = 'block';
-          extensionStatusEl.className = 'extension-status not-available';
-          extensionStatusEl.innerHTML = `
-            <strong>✗ Error Checking Extension</strong>
-            <p>${error.message}</p>
-          `;
-          submitBtn.disabled = true;
-          addLogEntry(`Error checking extension: ${error.message}`, "error");
-          return false;
-        }
-      }
-
-      checkExtensionBtn.addEventListener('click', checkExtension);
-
-      async function openSmartschoolTab(domain) {
-        const url = `https://${domain}`;
-        addLogEntry(`Opening ${url} in a new tab and focusing...`, 'info');
-        const newTab = window.open(url, '_blank');
-        if (newTab) newTab.focus();
-        addLogEntry('Waiting 1 second before retrying...', 'info');
-        return new Promise(resolve => setTimeout(resolve, 1000));
-      }
-
-      async function requestAuthCode(domain, retry = true) {
-        try {
-          addLogEntry(`Requesting authentication for domain: ${domain}`);
-          showAuthPopup();
-          addLogEntry("Waiting for auth code from extension...");
-          const authResult = await smidClient.getAuthCode(domain);
-          return authResult;
-        } catch (error) {
-          if (retry && error.message === "No matching tab found") {
-            addLogEntry(`Error: ${error.message}`, 'error');
-            addLogEntry('Opening Smartschool tab and retrying...', 'info');
-            await openSmartschoolTab(domain);
-            addLogEntry('Retrying authorization request...', 'info');
-            return requestAuthCode(domain, false);
-          }
-          throw error;
-        }
-      }
-
-      authForm.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        const smartschoolSubdomain = subdomainInput.value.trim();
-
-        if (!smartschoolSubdomain) {
-          showStatus('Please enter a SmartSchool subdomain.', 'error');
-          return;
-        }
-
-        setLoading(true);
-        hideStatus();
-        const fullDomain = `${smartschoolSubdomain}.smartschool.be`;
-
-        try {
-          const isExtensionAvailable = await checkExtension();
-          if (!isExtensionAvailable) {
-            throw new Error("SMID extension is not available. Please install it first.");
-          }
-          const authResult = await requestAuthCode(fullDomain);
-
-          if (!authResult || !authResult.code) {
-            throw new Error("Failed to get authorization code from extension");
-          }
-
-          if (authResult.token) {
-            document.cookie = `token=${authResult.token}; path=/; secure; samesite=strict`;
-            openDashboardBtn.disabled = false;
-          }
-
-          addLogEntry(`Received authorization code: ${authResult.code.substring(0, 8)}...`, 'success');
-          hideAuthPopup();
-          rawResponse.textContent = JSON.stringify(authResult, null, 2);
-          addLogEntry(`Requesting user ID with authorization code...`);
-
-          const userIdUrl = `/v1/user-id?code=${encodeURIComponent(authResult.code)}`;
-          const userIdResponse = await fetch(userIdUrl);
-
-          if (!userIdResponse.ok) {
-            throw new Error(`User ID request failed: ${userIdResponse.status} - ${userIdResponse.statusText}`);
-          }
-
-          const userData = await userIdResponse.json();
-          addLogEntry(`Received user ID response with status: ${userIdResponse.status}`);
-
-          rawResponse.textContent = JSON.stringify(userData, null, 2);
-
-          if (userData.userId || userData.user_id) {
-            const userId = userData.userId || userData.user_id;
-            showStatus(`Successfully retrieved user ID: ${userId}`, 'success');
-            addLogEntry(`User ID retrieved: ${userId}`, 'success');
-          } else if (userData.error) {
-            showStatus(`Error: ${userData.error}`, 'error');
-            addLogEntry(`Error: ${userData.error}`, 'error');
-          } else {
-            showStatus('User ID not found in response', 'error');
-            addLogEntry('User ID not found in response', 'error');
-          }
-        } catch (error) {
-          hideAuthPopup();
-          rawResponse.textContent = `Error: ${error.message}`;
-          showStatus(error.message, 'error');
-          addLogEntry(`Error: ${error.message}`, 'error');
-        } finally {
-          setLoading(false);
-          hideAuthPopup();
-          addLogEntry('Request process completed');
-        }
-      });
-
-      openDashboardBtn.addEventListener('click', function() {
-            const token = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, "$1");
-            if (token) {
-              window.location.href = "/dashboard";
-            } else {
-                showStatus('No token found. Please authenticate first.', 'error');
-                openDashboardBtn.disabled = true;
-            }
+    <footer>
+      <p>
+        SMID is an unofficial tool created to simplify SmartSchool integration.
+      </p>
+      <p>
+        Built by
+        <a
+          href="https://www.alessiodam.dev/"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Alessio D'Ambrosio</a
+        >
+        —
+        <a
+          href="https://github.com/alessiodam/SMID"
+          target="_blank"
+          rel="noopener noreferrer"
+          >View on GitHub</a
+        >
+      </p>
+    </footer>
+    <script src="/smid-client.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const subdomainInput = document.getElementById("smartschoolSubdomain");
+        const domainPreview = document.getElementById("domainPreview");
+        const authForm = document.getElementById("authForm");
+        const rawResponse = document.getElementById("rawResponse");
+        const statusEl = document.getElementById("status");
+        const loadingEl = document.getElementById("loading");
+        const submitBtn = document.getElementById("submitBtn");
+        const openDashboardBtn = document.getElementById("openDashboardBtn");
+        const copyBtn = document.getElementById("copyBtn");
+        const requestLogEl = document.getElementById("requestLog");
+        const checkExtensionBtn = document.getElementById("checkExtensionBtn");
+        const extensionStatusEl = document.getElementById("extensionStatus");
+        const authPopup = document.getElementById("authPopup");
+        const smidClient = new SMIDClient();
+        subdomainInput.addEventListener("input", function () {
+          let subdomain = subdomainInput.value.toLowerCase().trim();
+          subdomain = subdomain.replace(/[^a-z0-9-]/g, "");
+          subdomainInput.value = subdomain;
+          domainPreview.textContent = subdomain
+            ? `${subdomain}.smartschool.be`
+            : ".smartschool.be";
         });
-
-      copyBtn.addEventListener('click', function() {
-        const textToCopy = rawResponse.textContent;
-        navigator.clipboard.writeText(textToCopy)
-                .then(() => {
-                  const originalText = copyBtn.textContent;
-                  copyBtn.textContent = 'Copied!';
-                  setTimeout(() => {
-                    copyBtn.textContent = originalText;
-                  }, 2000);
-                })
-                .catch(err => {
-                  console.error('Failed to copy: ', err);
-                });
-      });
-
-      function showStatus(message, type) {
-        statusEl.textContent = message;
-        statusEl.className = `status ${type}`;
-        statusEl.style.display = 'block';
-      }
-
-      function hideStatus() {
-        statusEl.style.display = 'none';
-      }
-
-      function setLoading(isLoading) {
-        if (isLoading) {
-          loadingEl.style.display = 'flex';
-          submitBtn.disabled = true;
-        } else {
-          loadingEl.style.display = 'none';
-          submitBtn.disabled = false;
+        function addLogEntry(message, type = "info") {
+          const timestamp = new Date().toLocaleTimeString();
+          const logEntry = document.createElement("div");
+          logEntry.className = `log-entry ${type}`;
+          logEntry.innerHTML = `<span class="timestamp">[${timestamp}]</span> ${message}`;
+          requestLogEl.appendChild(logEntry);
+          requestLogEl.scrollTop = requestLogEl.scrollHeight;
         }
-      }
+        function showAuthPopup() {
+          authPopup.classList.add("active");
+        }
+        function hideAuthPopup() {
+          authPopup.classList.remove("active");
+        }
+        function showStatus(message, type) {
+          statusEl.textContent = message;
+          statusEl.className = `status ${type}`;
+          statusEl.style.display = "block";
+        }
+        function hideStatus() {
+          statusEl.style.display = "none";
+        }
+        function setLoading(isLoading) {
+          if (isLoading) {
+            loadingEl.classList.add("active");
+            submitBtn.disabled = true;
+          } else {
+            loadingEl.classList.remove("active");
+            submitBtn.disabled = false;
+          }
+        }
+        async function checkExtension() {
+          try {
+            addLogEntry("Checking SMID extension...");
+            const isAvailable = await smidClient.checkExtension();
 
-      setTimeout(() => {
-        checkExtension();
-      }, 500);
-    });
-  </script>
-</body>
+            if (isAvailable) {
+              const version = await smidClient.getExtensionVersion();
+              extensionStatusEl.className = "extension-status available";
+              extensionStatusEl.innerHTML = `<strong>✓ SMID Extension Ready</strong><p>Version ${version}</p>`;
+              extensionStatusEl.style.display = "block";
+              submitBtn.disabled = false;
+              addLogEntry("SMID extension available v" + version, "success");
+            } else {
+              extensionStatusEl.className = "extension-status not-available";
+              extensionStatusEl.innerHTML = `<strong>✗ Extension Not Found</strong><p><a href="https://chromewebstore.google.com/detail/poohpalffkmnicfcmdjofoaeagghgmdc" target="_blank" rel="noopener noreferrer">Install from Chrome Web Store</a></p>`;
+              extensionStatusEl.style.display = "block";
+              submitBtn.disabled = true;
+              addLogEntry("SMID extension not detected", "error");
+            }
+            return isAvailable;
+          } catch (error) {
+            extensionStatusEl.className = "extension-status not-available";
+            extensionStatusEl.innerHTML = `<strong>✗ Error Checking Extension</strong><p>${error.message}</p>`;
+            extensionStatusEl.style.display = "block";
+            submitBtn.disabled = true;
+            addLogEntry(`Error: ${error.message}`, "error");
+            return false;
+          }
+        }
+        checkExtensionBtn.addEventListener("click", checkExtension);
+        async function openSmartschoolTab(domain) {
+          const url = `https://${domain}`;
+          addLogEntry(`Opening ${url}...`, "info");
+          const newTab = window.open(url, "_blank");
+          if (newTab) newTab.focus();
+          return new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+        async function requestAuthCode(domain, retry = true) {
+          try {
+            addLogEntry(`Requesting auth for ${domain}...`);
+            showAuthPopup();
+            return await smidClient.getAuthCode(domain);
+          } catch (error) {
+            if (retry && error.message === "No matching tab found") {
+              addLogEntry("SmartSchool tab not found, opening...", "info");
+              await openSmartschoolTab(domain);
+              return requestAuthCode(domain, false);
+            }
+            throw error;
+          }
+        }
+        authForm.addEventListener("submit", async function (event) {
+          event.preventDefault();
+          const smartschoolSubdomain = subdomainInput.value.trim();
+          if (!smartschoolSubdomain) {
+            showStatus("Please enter your school subdomain.", "error");
+            return;
+          }
+          setLoading(true);
+          hideStatus();
+          const fullDomain = `${smartschoolSubdomain}.smartschool.be`;
+          try {
+            const isExtensionAvailable = await checkExtension();
+            if (!isExtensionAvailable) {
+              throw new Error(
+                "SMID extension not found. Please install it first.",
+              );
+            }
+            const authResult = await requestAuthCode(fullDomain);
+            if (!authResult || !authResult.code) {
+              throw new Error("Failed to get authorization code.");
+            }
+            if (authResult.token) {
+              document.cookie = `token=${authResult.token}; path=/; secure; samesite=strict`;
+              openDashboardBtn.disabled = false;
+            }
+            addLogEntry(
+              `Auth successful: ${authResult.code.substring(0, 8)}...`,
+              "success",
+            );
+            hideAuthPopup();
+            rawResponse.textContent = JSON.stringify(authResult, null, 2);
+            const userIdUrl = `/v1/user-id?code=${encodeURIComponent(authResult.code)}`;
+            const userIdResponse = await fetch(userIdUrl);
+            if (!userIdResponse.ok) {
+              throw new Error(
+                `User ID request failed: ${userIdResponse.status}`,
+              );
+            }
+            const userData = await userIdResponse.json();
+            rawResponse.textContent = JSON.stringify(userData, null, 2);
+            if (userData.userId || userData.user_id) {
+              const userId = userData.userId || userData.user_id;
+              showStatus(`✓ User ID: ${userId}`, "success");
+              addLogEntry(`User ID retrieved: ${userId}`, "success");
+            } else if (userData.error) {
+              showStatus(`✗ Error: ${userData.error}`, "error");
+              addLogEntry(`Error: ${userData.error}`, "error");
+            } else {
+              showStatus("✗ No user ID found in response", "error");
+            }
+          } catch (error) {
+            hideAuthPopup();
+            rawResponse.textContent = `Error: ${error.message}`;
+            showStatus(`✗ ${error.message}`, "error");
+            addLogEntry(`Error: ${error.message}`, "error");
+          } finally {
+            setLoading(false);
+            hideAuthPopup();
+            addLogEntry("Process completed");
+          }
+        });
+        openDashboardBtn.addEventListener("click", function () {
+          const token = document.cookie.replace(
+            /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
+            "$1",
+          );
+          if (token) {
+            window.location.href = "/dashboard";
+          } else {
+            showStatus("No token found. Please authenticate first.", "error");
+          }
+        });
+        copyBtn.addEventListener("click", function () {
+          const textToCopy = rawResponse.textContent;
+          navigator.clipboard
+            .writeText(textToCopy)
+            .then(() => {
+              const originalText = copyBtn.textContent;
+              copyBtn.textContent = "✓ Copied";
+              setTimeout(() => {
+                copyBtn.textContent = originalText;
+              }, 2000);
+            })
+            .catch((err) => console.error("Copy failed:", err));
+        });
+        setTimeout(() => {
+          checkExtension();
+        }, 500);
+      });
+    </script>
+  </body>
 </html>

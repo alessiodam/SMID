@@ -1,174 +1,484 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{.Title}}</title>
-    <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
-<header>
-    <h1><a href="/" style="color: white; text-decoration: none">SMID Dashboard</a></h1>
-</header>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-<div class="container dashboard-container">
-    <main>
-        <div class="user-profile">
-            <h2>Your Account Information</h2>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #0f0f0f;
+        color: #e0e0e0;
+        line-height: 1.6;
+      }
 
-            <div id="unsaved-warning" class="warning hidden">
-                <p>You have unsaved changes! Click Save to apply your changes.</p>
+      header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+        border-bottom: 1px solid #2a2a2a;
+        padding: 2rem 0;
+        margin-bottom: 3rem;
+      }
+
+      header h1 {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+
+      header h1 a {
+        color: #ffffff;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+
+      header h1 a:hover {
+        color: #4a9eff;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem 3rem;
+      }
+
+      main {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      section {
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        padding: 2rem;
+        background: #1a1a1a;
+      }
+
+      section h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: #ffffff;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #ffffff;
+        font-size: 0.95rem;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        background: #0f0f0f;
+        color: #e0e0e0;
+        font-family: "Inter", sans-serif;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #4a9eff;
+        box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
+      }
+
+      .form-group input:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .form-group input.changed {
+        border-color: #4a9eff;
+        box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
+      }
+
+      .hint {
+        display: block;
+        font-size: 0.8rem;
+        color: #888;
+        margin-top: 0.5rem;
+      }
+
+      .change-status {
+        font-weight: 600;
+        margin-left: 0.5rem;
+      }
+
+      .change-status.allowed {
+        color: #34d399;
+      }
+
+      .change-status.not-allowed {
+        color: #ef4444;
+      }
+
+      .status {
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        font-weight: 500;
+        display: none;
+      }
+
+      .status.success {
+        background: rgba(52, 211, 153, 0.1);
+        border: 1px solid rgba(52, 211, 153, 0.3);
+        color: #34d399;
+      }
+
+      .status.error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #ef4444;
+      }
+
+      .status:not(.hidden) {
+        display: block;
+      }
+
+      .warning {
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        background: rgba(251, 146, 60, 0.1);
+        border: 1px solid rgba(251, 146, 60, 0.3);
+        color: #fb923c;
+        font-weight: 500;
+      }
+
+      .warning.hidden {
+        display: none;
+      }
+
+      .warning p {
+        margin: 0;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #2a2a2a;
+      }
+
+      button {
+        flex: 1;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.95rem;
+        font-family: "Inter", sans-serif;
+      }
+
+      button:not(:disabled) {
+        cursor: pointer;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      #save-btn {
+        background: #4a9eff;
+        color: #000;
+      }
+
+      #save-btn:not(:disabled):hover {
+        background: #3a8ee5;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+      }
+
+      #save-btn:disabled {
+        opacity: 0.5;
+      }
+
+      footer {
+        width: 100%;
+        margin-top: 3rem;
+        padding: 2rem 1.5rem;
+        border-top: 1px solid #2a2a2a;
+        text-align: center;
+        font-size: 0.85rem;
+        color: #666;
+      }
+
+      footer p {
+        margin: 0.5rem 0;
+      }
+
+      footer a {
+        color: #4a9eff;
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        header h1 {
+          font-size: 1.5rem;
+        }
+
+        section {
+          padding: 1.5rem;
+        }
+
+        .form-actions {
+          flex-direction: column;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1><a href="/">SMID — Dashboard</a></h1>
+    </header>
+
+    <div class="container">
+      <main>
+        <section class="user-profile">
+          <h2>Your Account Information</h2>
+
+          <div id="unsaved-warning" class="warning hidden">
+            <p>You have unsaved changes! Click Save to apply your changes.</p>
+          </div>
+
+          <div id="status-message" class="status hidden"></div>
+
+          <form id="user-form">
+            <div class="form-group">
+              <label for="user-id">SMID ID:</label>
+              <input type="text" id="user-id" value="{{.User.ID}}" disabled />
             </div>
 
-            <div id="status-message" class="status hidden"></div>
+            <div class="form-group">
+              <label for="username">Username:</label>
+              <input
+                type="text"
+                id="username"
+                value="{{.User.Username}}"
+                data-original="{{.User.Username}}"
+              />
+              <span class="hint" id="username-hint">
+                {{ if .User.LastUsernameChange }} Last changed:
+                {{.User.LastUsernameChange.Format "2006-01-02"}}
+                <span class="change-status" id="username-status"></span>
+                {{ end }}
+              </span>
+            </div>
 
-            <form id="user-form">
-                <div class="form-group">
-                    <label for="user-id">SMID ID:</label>
-                    <input type="text" id="user-id" value="{{.User.ID}}" disabled>
-                </div>
+            <div class="form-group">
+              <label for="display-name">Display Name:</label>
+              <input
+                type="text"
+                id="display-name"
+                value="{{.User.DisplayName}}"
+                data-original="{{.User.DisplayName}}"
+              />
+              <span class="hint" id="displayname-hint">
+                {{ if .User.LastDisplayNameChange }} Last changed:
+                {{.User.LastDisplayNameChange.Format "2006-01-02"}}
+                <span class="change-status" id="displayname-status"></span>
+                {{ end }}
+              </span>
+            </div>
 
-                <div class="form-group">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" value="{{.User.Username}}" data-original="{{.User.Username}}">
-                    <span class="hint" id="username-hint">
-                            {{ if .User.LastUsernameChange }}
-                                Last changed: {{.User.LastUsernameChange.Format "2006-01-02"}}
-                                <span class="change-status" id="username-status"></span>
-                            {{ end }}
-                        </span>
-                </div>
+            <div class="form-group">
+              <label for="upstream-id">Smartschool User ID (hashed):</label>
+              <input
+                type="text"
+                id="upstream-id"
+                value="{{.User.UpstreamID}}"
+                disabled
+              />
+            </div>
 
-                <div class="form-group">
-                    <label for="display-name">Display Name:</label>
-                    <input type="text" id="display-name" value="{{.User.DisplayName}}" data-original="{{.User.DisplayName}}">
-                    <span class="hint" id="displayname-hint">
-                            {{ if .User.LastDisplayNameChange }}
-                                Last changed: {{.User.LastDisplayNameChange.Format "2006-01-02"}}
-                                <span class="change-status" id="displayname-status"></span>
-                            {{ end }}
-                        </span>
-                </div>
+            <div class="form-group">
+              <label for="created-at">Account Created:</label>
+              <input
+                type="text"
+                id="created-at"
+                value='{{.User.CreatedAt.Format "2006-01-02"}}'
+                disabled
+              />
+            </div>
 
-                <div class="form-group">
-                    <label for="upstream-id">Smartschool User ID (hashed):</label>
-                    <input type="text" id="upstream-id" value="{{.User.UpstreamID}}" disabled>
-                </div>
+            <div class="form-actions">
+              <button type="button" id="save-btn" disabled>Save Changes</button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
 
-                <div class="form-group">
-                    <label for="created-at">Account Created:</label>
-                    <input type="text" id="created-at" value="{{.User.CreatedAt.Format "2006-01-02"}}" disabled>
-                </div>
+    <footer>
+      <p>
+        SMID is an unofficial tool created to simplify SmartSchool integration.
+      </p>
+      <p>
+        Built by
+        <a
+          href="https://www.alessiodam.dev/"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Alessio D'Ambrosio</a
+        >
+        —
+        <a
+          href="https://github.com/alessiodam/SMID"
+          target="_blank"
+          rel="noopener noreferrer"
+          >View on GitHub</a
+        >
+      </p>
+    </footer>
 
-                <div class="form-actions">
-                    <button type="button" id="save-btn" disabled>Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </main>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const form = document.getElementById('user-form');
-        const saveBtn = document.getElementById('save-btn');
-        const unsavedWarning = document.getElementById('unsaved-warning');
-        const statusMessage = document.getElementById('status-message');
-        const usernameInput = document.getElementById('username');
-        const displayNameInput = document.getElementById('display-name');
-        const usernameHint = document.getElementById('username-hint');
-        const displayNameHint = document.getElementById('displayname-hint');
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("user-form");
+        const saveBtn = document.getElementById("save-btn");
+        const unsavedWarning = document.getElementById("unsaved-warning");
+        const statusMessage = document.getElementById("status-message");
+        const usernameInput = document.getElementById("username");
+        const displayNameInput = document.getElementById("display-name");
+        const usernameHint = document.getElementById("username-hint");
+        const displayNameHint = document.getElementById("displayname-hint");
 
         let hasUnsavedChanges = false;
 
-        const currentDate = new Date('2025-03-08T11:36:49Z');
+        const currentDate = new Date("2025-03-08T11:36:49Z");
 
-        let lastUsernameChange = new Date('{{.User.LastUsernameChange.Format "2006-01-02"}}');
-        let lastDisplayNameChange = new Date('{{.User.LastDisplayNameChange.Format "2006-01-02"}}');
+        let lastUsernameChange = new Date(
+          '{{.User.LastUsernameChange.Format "2006-01-02"}}',
+        );
+        let lastDisplayNameChange = new Date(
+          '{{.User.LastDisplayNameChange.Format "2006-01-02"}}',
+        );
 
         function canChangeUsername() {
-            const timeDiff = currentDate - lastUsernameChange;
-            const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-            return daysDiff >= 30;
+          const timeDiff = currentDate - lastUsernameChange;
+          const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+          return daysDiff >= 30;
         }
 
         function canChangeDisplayName() {
-            const timeDiff = currentDate - lastDisplayNameChange;
-            const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-            return daysDiff >= 7;
+          const timeDiff = currentDate - lastDisplayNameChange;
+          const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+          return daysDiff >= 7;
         }
 
         function formatDate(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+          return `${year}-${month}-${day}`;
         }
 
         function getNextUsernameChangeDate() {
-            const nextDate = new Date(lastUsernameChange.getTime());
-            nextDate.setDate(nextDate.getDate() + 30);
-            return formatDate(nextDate);
+          const nextDate = new Date(lastUsernameChange.getTime());
+          nextDate.setDate(nextDate.getDate() + 30);
+          return formatDate(nextDate);
         }
 
         function getNextDisplayNameChangeDate() {
-            const nextDate = new Date(lastDisplayNameChange.getTime());
-            nextDate.setDate(nextDate.getDate() + 7);
-            return formatDate(nextDate);
+          const nextDate = new Date(lastDisplayNameChange.getTime());
+          nextDate.setDate(nextDate.getDate() + 7);
+          return formatDate(nextDate);
         }
 
         function updateUsernameHint() {
-            const usernameStatus = document.getElementById('username-status');
-            if (lastUsernameChange instanceof Date && !isNaN(lastUsernameChange)) {
-                if (!canChangeUsername()) {
-                    const timeDiff = currentDate - lastUsernameChange;
-                    const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-                    const daysRemaining = 30 - daysDiff;
-                    usernameStatus.textContent = `(${daysRemaining} days until next change allowed)`;
-                    usernameStatus.classList.add('not-allowed');
-                    usernameStatus.classList.remove('allowed');
-                    usernameInput.setAttribute('data-allowed', 'false');
-                    usernameInput.disabled = true;
-                } else {
-                    usernameStatus.textContent = `(can be changed)`;
-                    usernameStatus.classList.add('allowed');
-                    usernameStatus.classList.remove('not-allowed');
-                    usernameInput.setAttribute('data-allowed', 'true');
-                    usernameInput.disabled = false;
-                }
+          const usernameStatus = document.getElementById("username-status");
+          if (
+            lastUsernameChange instanceof Date &&
+            !isNaN(lastUsernameChange)
+          ) {
+            if (!canChangeUsername()) {
+              const timeDiff = currentDate - lastUsernameChange;
+              const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+              const daysRemaining = 30 - daysDiff;
+              usernameStatus.textContent = `(${daysRemaining} days until next change allowed)`;
+              usernameStatus.classList.add("not-allowed");
+              usernameStatus.classList.remove("allowed");
+              usernameInput.setAttribute("data-allowed", "false");
+              usernameInput.disabled = true;
+            } else {
+              usernameStatus.textContent = `(can be changed)`;
+              usernameStatus.classList.add("allowed");
+              usernameStatus.classList.remove("not-allowed");
+              usernameInput.setAttribute("data-allowed", "true");
+              usernameInput.disabled = false;
             }
+          }
         }
 
         function updateDisplayNameHint() {
-            const displayNameStatus = document.getElementById('displayname-status');
-            if (lastDisplayNameChange instanceof Date && !isNaN(lastDisplayNameChange)) {
-                if (!canChangeDisplayName()) {
-                    const timeDiff = currentDate - lastDisplayNameChange;
-                    const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-                    const daysRemaining = 7 - daysDiff;
-                    displayNameStatus.textContent = `(${daysRemaining} days until next change allowed)`;
-                    displayNameStatus.classList.add('not-allowed');
-                    displayNameStatus.classList.remove('allowed');
-                    displayNameInput.setAttribute('data-allowed', 'false');
-                    displayNameInput.disabled = true;
-                } else {
-                    displayNameStatus.textContent = `(can be changed)`;
-                    displayNameStatus.classList.add('allowed');
-                    displayNameStatus.classList.remove('not-allowed');
-                    displayNameInput.setAttribute('data-allowed', 'true');
-                    displayNameInput.disabled = false;
-                }
+          const displayNameStatus =
+            document.getElementById("displayname-status");
+          if (
+            lastDisplayNameChange instanceof Date &&
+            !isNaN(lastDisplayNameChange)
+          ) {
+            if (!canChangeDisplayName()) {
+              const timeDiff = currentDate - lastDisplayNameChange;
+              const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+              const daysRemaining = 7 - daysDiff;
+              displayNameStatus.textContent = `(${daysRemaining} days until next change allowed)`;
+              displayNameStatus.classList.add("not-allowed");
+              displayNameStatus.classList.remove("allowed");
+              displayNameInput.setAttribute("data-allowed", "false");
+              displayNameInput.disabled = true;
+            } else {
+              displayNameStatus.textContent = `(can be changed)`;
+              displayNameStatus.classList.add("allowed");
+              displayNameStatus.classList.remove("not-allowed");
+              displayNameInput.setAttribute("data-allowed", "true");
+              displayNameInput.disabled = false;
             }
+          }
         }
 
         function showStatus(message, type) {
-            statusMessage.textContent = message;
-            statusMessage.className = `status ${type}`;
-            statusMessage.classList.remove('hidden');
+          statusMessage.textContent = message;
+          statusMessage.className = `status ${type}`;
+          statusMessage.classList.remove("hidden");
 
-            setTimeout(() => {
-                statusMessage.classList.add('hidden');
-            }, 5000);
+          setTimeout(() => {
+            statusMessage.classList.add("hidden");
+          }, 5000);
         }
 
         updateUsernameHint();
@@ -176,115 +486,131 @@
 
         const editableInputs = [usernameInput, displayNameInput];
 
-        editableInputs.forEach(input => {
-            input.addEventListener('input', function() {
-                const isChanged = input.value !== input.getAttribute('data-original');
+        editableInputs.forEach((input) => {
+          input.addEventListener("input", function () {
+            const isChanged =
+              input.value !== input.getAttribute("data-original");
 
-                if (isChanged) {
-                    input.classList.add('changed');
-                } else {
-                    input.classList.remove('changed');
-                }
-
-                hasUnsavedChanges = editableInputs.some(input =>
-                    input.value !== input.getAttribute('data-original')
-                );
-
-                if (hasUnsavedChanges) {
-                    unsavedWarning.classList.remove('hidden');
-                    saveBtn.disabled = false;
-                } else {
-                    unsavedWarning.classList.add('hidden');
-                    saveBtn.disabled = true;
-                }
-            });
-        });
-
-        saveBtn.addEventListener('click', function() {
-            let canSave = true;
-            const changedFields = {};
-            let confirmationMessage = 'Are you sure you want to save the following changes?\n\n';
-
-            if (usernameInput.value !== usernameInput.getAttribute('data-original')) {
-                if (!canChangeUsername()) {
-                    showStatus('Username can only be changed every 30 days.', 'error');
-                    canSave = false;
-                } else {
-                    changedFields.username = usernameInput.value;
-                    confirmationMessage += `- Username will be changed from "${usernameInput.getAttribute('data-original')}" to "${usernameInput.value}"\n`;
-                    confirmationMessage += `  You won't be able to change your username again until ${getNextUsernameChangeDate()} (30 days from now)\n\n`;
-                }
+            if (isChanged) {
+              input.classList.add("changed");
+            } else {
+              input.classList.remove("changed");
             }
 
-            if (displayNameInput.value !== displayNameInput.getAttribute('data-original')) {
-                if (!canChangeDisplayName()) {
-                    showStatus('Display name can only be changed every week.', 'error');
-                    canSave = false;
-                } else {
-                    changedFields.display_name = displayNameInput.value;
-                    confirmationMessage += `- Display name will be changed from "${displayNameInput.getAttribute('data-original')}" to "${displayNameInput.value}"\n`;
-                    confirmationMessage += `  You won't be able to change your display name again until ${getNextDisplayNameChangeDate()} (7 days from now)\n`;
-                }
-            }
+            hasUnsavedChanges = editableInputs.some(
+              (input) => input.value !== input.getAttribute("data-original"),
+            );
 
-            if (canSave && Object.keys(changedFields).length > 0) {
-                if (confirm(confirmationMessage)) {
-                    fetch('/dashboard', {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(changedFields)
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Failed to update user information');
-                            }
-                            return response;
-                        })
-                        .then(() => {
-                            console.log('Saved updated fields:', changedFields);
-
-                            if (changedFields.username) {
-                                lastUsernameChange = new Date(currentDate);
-                                usernameHint.innerHTML = `Last changed: ${formatDate(lastUsernameChange)} <span class="change-status" id="username-status"></span>`;
-                            }
-
-                            if (changedFields.display_name) {
-                                lastDisplayNameChange = new Date(currentDate);
-                                displayNameHint.innerHTML = `Last changed: ${formatDate(lastDisplayNameChange)} <span class="change-status" id="displayname-status"></span>`;
-                            }
-
-                            updateUsernameHint();
-                            updateDisplayNameHint();
-
-                            editableInputs.forEach(input => {
-                                input.setAttribute('data-original', input.value);
-                                input.classList.remove('changed');
-                            });
-
-                            hasUnsavedChanges = false;
-                            unsavedWarning.classList.add('hidden');
-                            saveBtn.disabled = true;
-
-                            showStatus('Changes saved successfully! Your next change dates have been updated.', 'success');
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            showStatus(error.message, 'error');
-                        });
-                }
-            }
-        });
-
-        window.addEventListener('beforeunload', function(e) {
             if (hasUnsavedChanges) {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
+              unsavedWarning.classList.remove("hidden");
+              saveBtn.disabled = false;
+            } else {
+              unsavedWarning.classList.add("hidden");
+              saveBtn.disabled = true;
             }
+          });
         });
-    });
-</script>
-</body>
+
+        saveBtn.addEventListener("click", function () {
+          let canSave = true;
+          const changedFields = {};
+          let confirmationMessage =
+            "Are you sure you want to save the following changes?\n\n";
+
+          if (
+            usernameInput.value !== usernameInput.getAttribute("data-original")
+          ) {
+            if (!canChangeUsername()) {
+              showStatus(
+                "Username can only be changed every 30 days.",
+                "error",
+              );
+              canSave = false;
+            } else {
+              changedFields.username = usernameInput.value;
+              confirmationMessage += `- Username will be changed from "${usernameInput.getAttribute("data-original")}" to "${usernameInput.value}"\n`;
+              confirmationMessage += `  You won't be able to change your username again until ${getNextUsernameChangeDate()} (30 days from now)\n\n`;
+            }
+          }
+
+          if (
+            displayNameInput.value !==
+            displayNameInput.getAttribute("data-original")
+          ) {
+            if (!canChangeDisplayName()) {
+              showStatus(
+                "Display name can only be changed every week.",
+                "error",
+              );
+              canSave = false;
+            } else {
+              changedFields.display_name = displayNameInput.value;
+              confirmationMessage += `- Display name will be changed from "${displayNameInput.getAttribute("data-original")}" to "${displayNameInput.value}"\n`;
+              confirmationMessage += `  You won't be able to change your display name again until ${getNextDisplayNameChangeDate()} (7 days from now)\n`;
+            }
+          }
+
+          if (canSave && Object.keys(changedFields).length > 0) {
+            if (confirm(confirmationMessage)) {
+              fetch("/dashboard", {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(changedFields),
+              })
+                .then((response) => {
+                  if (!response.ok) {
+                    throw new Error("Failed to update user information");
+                  }
+                  return response;
+                })
+                .then(() => {
+                  console.log("Saved updated fields:", changedFields);
+
+                  if (changedFields.username) {
+                    lastUsernameChange = new Date(currentDate);
+                    usernameHint.innerHTML = `Last changed: ${formatDate(lastUsernameChange)} <span class="change-status" id="username-status"></span>`;
+                  }
+
+                  if (changedFields.display_name) {
+                    lastDisplayNameChange = new Date(currentDate);
+                    displayNameHint.innerHTML = `Last changed: ${formatDate(lastDisplayNameChange)} <span class="change-status" id="displayname-status"></span>`;
+                  }
+
+                  updateUsernameHint();
+                  updateDisplayNameHint();
+
+                  editableInputs.forEach((input) => {
+                    input.setAttribute("data-original", input.value);
+                    input.classList.remove("changed");
+                  });
+
+                  hasUnsavedChanges = false;
+                  unsavedWarning.classList.add("hidden");
+                  saveBtn.disabled = true;
+
+                  showStatus(
+                    "Changes saved successfully! Your next change dates have been updated.",
+                    "success",
+                  );
+                })
+                .catch((error) => {
+                  console.error("Error:", error);
+                  showStatus(error.message, "error");
+                });
+            }
+          }
+        });
+
+        window.addEventListener("beforeunload", function (e) {
+          if (hasUnsavedChanges) {
+            e.preventDefault();
+            e.returnValue = "";
+            return "";
+          }
+        });
+      });
+    </script>
+  </body>
 </html>
