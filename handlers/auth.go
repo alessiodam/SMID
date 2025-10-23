@@ -64,6 +64,7 @@ func AuthCodeHandler(c *fiber.Ctx) error {
 		}
 
 		hashedUpstreamID := fmt.Sprintf("%x", sha256.Sum256([]byte(upstreamID)))
+		hashedPlatformID := fmt.Sprintf("%x", sha256.Sum256([]byte(strings.Split(upstreamID, "_")[0])))
 
 		var user models.User
 		result := db.DB.Where("upstream_id = ?", hashedUpstreamID).First(&user)
@@ -71,6 +72,7 @@ func AuthCodeHandler(c *fiber.Ctx) error {
 			newUserID := snowflakeNode.Generate().Int64()
 			user = models.User{
 				ID:                    newUserID,
+				PlatformID:            hashedPlatformID,
 				UpstreamID:            hashedUpstreamID,
 				Username:              fmt.Sprintf("user_%d", newUserID),
 				DisplayName:           fmt.Sprintf("User %d", newUserID),
@@ -139,6 +141,7 @@ func UserIdHandler(c *fiber.Ctx) error {
 		"user_id":            authCode.UserID,
 		"username":           authCode.User.Username,
 		"display_name":       authCode.User.DisplayName,
+		"hashed_platform_id": authCode.User.PlatformID,
 		"hashed_upstream_id": authCode.User.UpstreamID,
 	})
 }

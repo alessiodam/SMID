@@ -1,12 +1,14 @@
 package models
 
 import (
-	"github.com/go-playground/validator/v10"
 	"time"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type User struct {
 	ID         int64  `gorm:"primaryKey" json:"id"`
+	PlatformID string `json:"platform_id"`
 	UpstreamID string `gorm:"uniqueIndex" json:"upstream_id"`
 
 	Username    string `json:"username" gorm:"size:24;uniqueIndex" validate:"required,alphanumspace,usernamechangetime"`
